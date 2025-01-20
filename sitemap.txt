@@ -1,0 +1,7 @@
+http://example.com/2025/01/20/new/
+http://example.com/contact/index.html
+http://example.com/categories/index.html
+http://example.com/tags/index.html
+http://example.com/about/index.html
+http://example.com/2025/01/14/hello-world/
+http://example.com/
