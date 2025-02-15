@@ -2,6 +2,24 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://1768161086.github,io/2025/02/07/buuctf-phpweb/</loc>
+    
+    <lastmod>2025-02-15</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>http://1768161086.github,io/2025/02/05/buuctf-The-mystery-of-ip/</loc>
+    
+    <lastmod>2025-02-15</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
     <loc>http://1768161086.github,io/2025/02/03/HardSQL/</loc>
     
     <lastmod>2025-02-15</lastmod>
@@ -210,6 +228,13 @@
   
   <url>
     <loc>http://1768161086.github,io/tags/tornado/</loc>
+    <lastmod>2025-02-15</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>http://1768161086.github,io/tags/X-Forwarded-For%E6%B3%A8%E5%85%A5/</loc>
     <lastmod>2025-02-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
