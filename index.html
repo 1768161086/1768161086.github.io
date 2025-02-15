@@ -105,8 +105,10 @@ flask模板注入如有不懂可看这篇文章
 魔术方法:
 1234567__class__  返回类型所属的对象__mro__    返回一个包含对象所继承的基类元组，方法在解析时按照元组的顺序解析。__base__   返回该对象所继承的基类  // __base__和__mro__都是用来寻找基类的__subclasses__   每个新类都保留了子类的引用，这个方法返回一个类中仍然可用的的引用的列表__init__  类的初始化方法__globals__  对包含函数全局变量的字典的引用
 
-基础知识：
-1.判断有无模板注入： ...</div><div class="recent-post-tags"><a class="post-tag fa fa-tag" href="javascript:void(0)" date-tags="web"> web</a><a class="post-tag fa fa-tag" href="javascript:void(0)" date-tags="原创"> 原创</a><a class="post-tag fa fa-tag" href="javascript:void(0)" date-tags="flask模板注入"> flask模板注入</a></div><div class="read-more"><a class="more" href="/2025/02/10/Web-python-template-injection/#more">ReadMore</a></div><hr></div><div class="recent-post-item"><div class="post-title"><a href="/2025/02/09/%E7%AB%9E%E4%BA%89%E6%9D%A1%E4%BB%B6/">竞争条件</a></div><div class="post-time"><i class="fa fa-table"></i><time datetime="2025-02-09T08:22:54.000Z">2025-02-09</time></div><div class="recent-post-content">
+
+
+1.判断有无模板注入：
+1ur ...</div><div class="recent-post-tags"><a class="post-tag fa fa-tag" href="javascript:void(0)" date-tags="web"> web</a><a class="post-tag fa fa-tag" href="javascript:void(0)" date-tags="原创"> 原创</a><a class="post-tag fa fa-tag" href="javascript:void(0)" date-tags="flask模板注入"> flask模板注入</a></div><div class="read-more"><a class="more" href="/2025/02/10/Web-python-template-injection/#more">ReadMore</a></div><hr></div><div class="recent-post-item"><div class="post-title"><a href="/2025/02/09/%E7%AB%9E%E4%BA%89%E6%9D%A1%E4%BB%B6/">竞争条件</a></div><div class="post-time"><i class="fa fa-table"></i><time datetime="2025-02-09T08:22:54.000Z">2025-02-09</time></div><div class="recent-post-content">
 CTF文件包含中竞争条件实现
 1.条件竞争介绍条件竞争是指一个系统的运行结果依赖于不受控制的事件的先后顺序。当这些不受控制的事件并没有按照开发者想要的方式运行时，就可能会出现 bug。例如网站文件上传，开发人员通过检测文件后缀名，设置白名单黑名单各种方式判断用户上传文件是否为危险文件，一旦发现，就会立马发现。同样的，若是我们在判断和删除事件这一时间差内进行一些操作岂不是也会成功？
 2.相关实验</div><div class="recent-post-tags"><a class="post-tag fa fa-tag" href="javascript:void(0)" date-tags="web"> web</a><a class="post-tag fa fa-tag" href="javascript:void(0)" date-tags="原创"> 原创</a><a class="post-tag fa fa-tag" href="javascript:void(0)" date-tags="竞争条件"> 竞争条件</a></div><div class="read-more"><a class="more" href="/2025/02/09/%E7%AB%9E%E4%BA%89%E6%9D%A1%E4%BB%B6/#more">ReadMore</a></div><hr></div><div class="recent-post-item"><div class="post-title"><a href="/2025/02/07/buuctf-phpweb/">buuctf_phpweb</a></div><div class="post-time"><i class="fa fa-table"></i><time datetime="2025-02-07T01:31:12.000Z">2025-02-07</time></div><div class="recent-post-content">
