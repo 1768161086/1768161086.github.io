@@ -145,7 +145,11 @@
 <p>可双写绕过：ununionion seselectlect </p>
 <h1 id="3-报错注入"><a href="#3-报错注入" class="headerlink" title="3.报错注入"></a>3.报错注入</h1><p>1.报错注入两个函数：</p>
 <p>（1）updatexml(xml_target, xpath_expr, new_xml)第一个参数：是string格式，为XML文档对象的名称。第二个参数：代表路径，Xpath格式的字符串。第三个参数：string格式，替换查找到的符合条件的数据。第二个参数跟extractvalue函数的第二个参数一样，因此也可利用且利用方式相同。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">1&#x27; union select 1,2,updatexml(1,concat(0x7e,database(),0x7e),1)#</span><br></pre></td></tr></table></figure>
+
 <p>（2）extractvalue(xml_frag, xpath_expr)接受两个字符串参数，一个XML标记片段xml_frag和一个XPath表达式xpath_expr（也称为定位器）；它返回CDATA第一个文本节点的text（），该节点是XPath表达式匹配的元素的子元素。第一个参数可以传入目标xml文档，第二个参数是用Xpath路径法表示的查找路径。作用：从目标xml中返回包含所查询值的字符串</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">1&#x27; union select 1,2,extractvalue(1,concat(&#x27;~&#x27;,(select database())))#</span><br></pre></td></tr></table></figure>
+
 <p>2.区别：</p>
 <p>^可来更换or,然后不用updatexml()，而是使用：extractvalue()原理都是一样的。</p>
 <h1 id="4-handler用法"><a href="#4-handler用法" class="headerlink" title="4..handler用法"></a>4..handler用法</h1><p>在MySQL中，handler也可以执行查询：</p>
