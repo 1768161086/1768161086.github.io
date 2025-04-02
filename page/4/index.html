@@ -98,7 +98,53 @@
 }( typeof global !== "undefined" ? global : this ) );</script><script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js" defer></script><script src="/js/main.js?v=2018.7.9" defer></script><!-- fancybox--><link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'"><script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js" defer></script><!-- busuanzi--><script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script><meta name="generator" content="Hexo 7.3.0"><link rel="alternate" href="/atom.xml" title="MyBlog" type="application/atom+xml">
 </head><body><section class="profile-close" id="cxo-profile"><div class="profile-avatar"><i class="fa fa-caret-left"></i><img src="/img/assets/cat.png"></div><!--.profile-saying
   i.fa.fa-comment
-  .saying--><div class="cxo-profile-inner"><div class="profile-name">userq</div><div class="profile-signature">for me</div><div class="friends"><div>FRIENDS</div><span><a href="//1768161086.github.io/" target="_black">friendA</a></span><span><a href="//github.com/" target="_black">friendB</a></span><span><a href="//github.com/" target="_black">friendC</a></span></div><div class="read-progress"></div></div></section><header id="cxo-intro" style="height: 70vh;background-image: url(/img/intro/index-bg.png);"><nav id="cxo-intro-nav"><section><div class="intro-nav-title"><a href="/">Mr.cheng's Blog</a></div><div class="intro-nav-label-box"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div><i class="fa fa-bars intro-nav-menu"><div class="intro-nav-drop"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div></i><div class="clear"></div></section></nav><h1>Mr.cheng's Blog</h1><h5>Welcome to my Blog!</h5><div class="intro-social"><a class="fa fa-github" href="//github.com/" target="_blank" title="github"></a><a class="fa fa-weibo" href="//www.weibo.com" target="_blank" title="weibo"></a><a class="fa fa-facebook" href="//www.facebook.com" target="_blank" title="facebook"></a><a class="fa fa-twitter" href="//twitter.com" target="_blank" title="twitter"></a><a class="fa fa-rss" href="/atom.xml" target="_blank" title="rss"></a></div></header><article class="cxo-up" id="cxo-content-outer"><section id="cxo-content-inner"><section id="recent-posts"><div class="recent-post-item"><div class="post-title"><a href="/2025/01/29/sql%E6%B3%A8%E5%85%A5/">sql注入</a></div><div class="post-time"><i class="fa fa-table"></i><time datetime="2025-01-29T07:55:09.000Z">2025-01-29</time></div><div class="recent-post-content">
+  .saying--><div class="cxo-profile-inner"><div class="profile-name">userq</div><div class="profile-signature">for me</div><div class="friends"><div>FRIENDS</div><span><a href="//1768161086.github.io/" target="_black">friendA</a></span><span><a href="//github.com/" target="_black">friendB</a></span><span><a href="//github.com/" target="_black">friendC</a></span></div><div class="read-progress"></div></div></section><header id="cxo-intro" style="height: 70vh;background-image: url(/img/intro/index-bg.png);"><nav id="cxo-intro-nav"><section><div class="intro-nav-title"><a href="/">Mr.cheng's Blog</a></div><div class="intro-nav-label-box"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div><i class="fa fa-bars intro-nav-menu"><div class="intro-nav-drop"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div></i><div class="clear"></div></section></nav><h1>Mr.cheng's Blog</h1><h5>Welcome to my Blog!</h5><div class="intro-social"><a class="fa fa-github" href="//github.com/" target="_blank" title="github"></a><a class="fa fa-weibo" href="//www.weibo.com" target="_blank" title="weibo"></a><a class="fa fa-facebook" href="//www.facebook.com" target="_blank" title="facebook"></a><a class="fa fa-twitter" href="//twitter.com" target="_blank" title="twitter"></a><a class="fa fa-rss" href="/atom.xml" target="_blank" title="rss"></a></div></header><article class="cxo-up" id="cxo-content-outer"><section id="cxo-content-inner"><section id="recent-posts"><div class="recent-post-item"><div class="post-title"><a href="/2025/02/05/buuctf-The-mystery-of-ip/">buuctf_The mystery of ip</a></div><div class="post-time"><i class="fa fa-table"></i><time datetime="2025-02-05T01:22:57.000Z">2025-02-05</time></div><div class="recent-post-content">
+[BJDCTF2020]The mystery of ip
+题目环境：
+
+添加HTTP请求头：
+1X-Forwarded-For: 1
+
+被成功执行，说明XFF可控，测试了半天，因为是php页面，所以没想到模版注入，通过查阅资料Flask可能存在Jinjia2模版注入漏洞PHP可能存在Twig模版注入漏洞
+添加模版算式，检测其是否可被执行：
+1X-Forwarded-For: &#123;&#123;7*7&#125;&#125;
+
+模版中算式被成功执行，尝试是否能执行命令：
+1X-Forwarded-For: &#123;&#123;system(&#x27;ls&#x27;)&#125; ...</div><div class="recent-post-tags"><a class="post-tag fa fa-tag" href="javascript:void(0)" date-tags="web"> web</a><a class="post-tag fa fa-tag" href="javascript:void(0)" date-tags="原创"> 原创</a><a class="post-tag fa fa-tag" href="javascript:void(0)" date-tags="X-Forwarded-For注入"> X-Forwarded-For注入</a></div><div class="read-more"><a class="more" href="/2025/02/05/buuctf-The-mystery-of-ip/#more">ReadMore</a></div><hr></div><div class="recent-post-item"><div class="post-title"><a href="/2025/02/03/HardSQL/">buuctf_HardSQL</a></div><div class="post-time"><i class="fa fa-table"></i><time datetime="2025-02-03T00:56:21.000Z">2025-02-03</time></div><div class="recent-post-content">
+[极客大挑战 2019]HardSQL
+题目环境：
+
+由题目可知是sql注入
+1.使用万能密码：
+10&#x27; or &#x27;1&#x27;=&#x27;1
+
+发现了一句话:你可别被我逮住了，臭弟弟
+其中union，select，order by等都被过滤了
+2.输入查询列：
+10&#x27; order by 3#
+
+通过常规注入回显的都是这句话
+3.我们尝试报错注入
+报错注入有两个函数，这里我们使用updatexml(a,b,c)，此函数a，c必须为String类型，因此可以使a,c不为String型进行报错
+(1)我们先去爆数据库：
+1?username=admin&amp;p ...</div><div class="recent-post-tags"><a class="post-tag fa fa-tag" href="javascript:void(0)" date-tags="web"> web</a><a class="post-tag fa fa-tag" href="javascript:void(0)" date-tags="原创"> 原创</a><a class="post-tag fa fa-tag" href="javascript:void(0)" date-tags="sql注入"> sql注入</a></div><div class="read-more"><a class="more" href="/2025/02/03/HardSQL/#more">ReadMore</a></div><hr></div><div class="recent-post-item"><div class="post-title"><a href="/2025/02/01/buuctf-easy-tornado/">buuctf-easy_tornado</a></div><div class="post-time"><i class="fa fa-table"></i><time datetime="2025-02-01T00:36:26.000Z">2025-02-01</time></div><div class="recent-post-content">
+[护网杯 2018]easy_tornado
+题目环境：
+
+打开flag.txt发现了flag的目录：&#x2F;fllllllllllllag
+打开huns.txt发现了md5(cookie_secret+md5(filename))
+因此可用推测该题是利用cookie_secret和文件名计算MD5来获取flag。
+
+注意题目easy_tornado；tornado是python的一个模板，可以看出这道题是模板注入类的题目
+
+模板注入必须通过传输型如的执行命令
+
+
+
+在tornado模板中，存在一些可以访问的快速对象,这里用到的是handler.settings，handler 指向Re ...</div><div class="recent-post-tags"><a class="post-tag fa fa-tag" href="javascript:void(0)" date-tags="web"> web</a><a class="post-tag fa fa-tag" href="javascript:void(0)" date-tags="原创"> 原创</a><a class="post-tag fa fa-tag" href="javascript:void(0)" date-tags="tornado"> tornado</a></div><div class="read-more"><a class="more" href="/2025/02/01/buuctf-easy-tornado/#more">ReadMore</a></div><hr></div><div class="recent-post-item"><div class="post-title"><a href="/2025/01/31/%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/">反序列化</a></div><div class="post-time"><i class="fa fa-table"></i><time datetime="2025-01-31T08:17:55.000Z">2025-01-31</time></div><div class="recent-post-content">
+反序列化相关知识点介绍
+
+1.魔法方法1.__sleep() &#x2F;&#x2F;执行serialize()时，先会调用这个函数2.__wakeup() &#x2F;&#x2F;将在反序列化之后立即调用（当反序列化时变量个数与实际不符时绕过）3.__construct() &#x2F;&#x2F;当对象被创建时，会触发进行初始化4.__destruct() &#x2F;&#x2F;对象被销毁时触发5.__toString()： &#x2F;&#x2F;当一个对象被当作字符串使用时触发6.__call() &#x2F;&#x2F;在对象上下文中调用不可访问的方法时触发7.__callSta ...</div><div class="recent-post-tags"><a class="post-tag fa fa-tag" href="javascript:void(0)" date-tags="web"> web</a><a class="post-tag fa fa-tag" href="javascript:void(0)" date-tags="原创"> 原创</a><a class="post-tag fa fa-tag" href="javascript:void(0)" date-tags="反序列化"> 反序列化</a></div><div class="read-more"><a class="more" href="/2025/01/31/%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/#more">ReadMore</a></div><hr></div><div class="recent-post-item"><div class="post-title"><a href="/2025/01/29/sql%E6%B3%A8%E5%85%A5/">sql注入</a></div><div class="post-time"><i class="fa fa-table"></i><time datetime="2025-01-29T07:55:09.000Z">2025-01-29</time></div><div class="recent-post-content">
 sql注入相关命令介绍
 
 1.sql相关查询命令1.查询字段数：
@@ -138,8 +184,4 @@ base64过滤器:
 <p>向 Nginx 服务器发送请求时，记录会保存在 &#x2F;var&#x2F;log&#x2F;nginx&#x2F;access.log 日志文件。那就可以传递一句话木马，保存在日志中，然后再包含日志文件，日志中的一句话木马就运行了。</p>
 </blockquote></div><div class="recent-post-tags"><a class="post-tag fa fa-tag" href="javascript:void(0)" date-tags="web"> web</a><a class="post-tag fa fa-tag" href="javascript:void(0)" date-tags="原创"> 原创</a><a class="post-tag fa fa-tag" href="javascript:void(0)" date-tags="文件包含"> 文件包含</a></div><div class="read-more"><a class="more" href="/2025/01/21/one/#more">ReadMore</a></div><hr></div><div class="recent-post-item"><div class="post-title"><a href="/2025/01/20/new/">命令执行相关知识点解释</a></div><div class="post-time"><i class="fa fa-table"></i><time datetime="2025-01-20T08:20:55.758Z">2025-01-20</time></div><div class="recent-post-content"><blockquote>
 <p>ctf中命令执行相关知识点总结</p>
-</blockquote></div><div class="recent-post-tags"><a class="post-tag fa fa-tag" href="javascript:void(0)" date-tags="web"> web</a><a class="post-tag fa fa-tag" href="javascript:void(0)" date-tags="http"> http</a><a class="post-tag fa fa-tag" href="javascript:void(0)" date-tags="命令执行"> 命令执行</a></div><div class="read-more"><a class="more" href="/2025/01/20/new/#more">ReadMore</a></div><hr></div><div class="recent-post-item"><div class="post-title"><a href="/2025/01/14/hello-world/">Hello World</a></div><div class="post-time"><i class="fa fa-table"></i><time datetime="2025-01-14T03:02:43.160Z">2025-01-14</time></div><div class="recent-post-content">Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub.
-Quick StartCreate a new post1$ hexo new &quot;My New Post&quot;
-
-More info: Writing
-Run server1$ hexo ser ...</div><div class="read-more"><a class="more" href="/2025/01/14/hello-world/#more">ReadMore</a></div><hr></div></section><nav class="cxo-page-nav"><a class="extend prev" rel="prev" href="/page/3/">&#60; PREV</a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><span class="page-number current">4</span></nav></section></article><footer id="cxo-footer-outer"><div id="cxo-footer-inner"><p class="footer-container"><span>Site by </span><a target="_blank" rel="noopener" href="http://hexo.io"><span>Hexo</span></a><span> | theme </span><a target="_blank" rel="noopener" href="https://github.com/Longlongyu/hexo-theme-Cxo"><span>Cxo</span></a></p><i class="fa fa-user"> </i><span id="busuanzi_value_site_uv"></span><span> | </span><i class="fa fa-eye"> </i><span id="busuanzi_value_site_pv"></span></div></footer><!-- catelog--><!-- top--><i class="fa fa-arrow-up close" id="go-up" aria-hidden="true"></i></body></html>
+</blockquote></div><div class="recent-post-tags"><a class="post-tag fa fa-tag" href="javascript:void(0)" date-tags="web"> web</a><a class="post-tag fa fa-tag" href="javascript:void(0)" date-tags="http"> http</a><a class="post-tag fa fa-tag" href="javascript:void(0)" date-tags="命令执行"> 命令执行</a></div><div class="read-more"><a class="more" href="/2025/01/20/new/#more">ReadMore</a></div><hr></div></section><nav class="cxo-page-nav"><a class="extend prev" rel="prev" href="/page/3/">&#60; PREV</a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><span class="page-number current">4</span><a class="page-number" href="/page/5/">5</a><a class="extend next" rel="next" href="/page/5/">NEXT &#62;</a></nav></section></article><footer id="cxo-footer-outer"><div id="cxo-footer-inner"><p class="footer-container"><span>Site by </span><a target="_blank" rel="noopener" href="http://hexo.io"><span>Hexo</span></a><span> | theme </span><a target="_blank" rel="noopener" href="https://github.com/Longlongyu/hexo-theme-Cxo"><span>Cxo</span></a></p><i class="fa fa-user"> </i><span id="busuanzi_value_site_uv"></span><span> | </span><i class="fa fa-eye"> </i><span id="busuanzi_value_site_pv"></span></div></footer><!-- catelog--><!-- top--><i class="fa fa-arrow-up close" id="go-up" aria-hidden="true"></i></body></html>

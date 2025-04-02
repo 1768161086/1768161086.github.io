@@ -1,0 +1,134 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"><meta name="author" content="userq"><meta name="renderer" content="webkit"><meta name="copyright" content="userq"><meta name="keywords" content="MyBlog"><meta name="description" content="MyBlog"><meta name="Cache-Control" content="no-cache"><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><title>Arjun查询参数 · Mr.cheng's Blog</title><link rel="stylesheet" href="/css/style.css?v=2018.7.9"><link rel="stylesheet" href="/css/animation.css?v=2018.7.9"><link rel="icon" href="/img/assets/favicon.ico"><link rel="stylesheet" href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css?version=1.5.6"><!-- scripts--><script>(function( w ){
+  "use strict";
+  // rel=preload support test
+  if( !w.loadCSS ){
+    w.loadCSS = function(){};
+  }
+  // define on the loadCSS obj
+  var rp = loadCSS.relpreload = {};
+  // rel=preload feature support test
+  // runs once and returns a function for compat purposes
+  rp.support = (function(){
+    var ret;
+    try {
+      ret = w.document.createElement( "link" ).relList.supports( "preload" );
+    } catch (e) {
+      ret = false;
+    }
+    return function(){
+      return ret;
+    };
+  })();
+
+  // if preload isn't supported, get an asynchronous load by using a non-matching media attribute
+  // then change that media back to its intended value on load
+  rp.bindMediaToggle = function( link ){
+    // remember existing media attr for ultimate state, or default to 'all'
+    var finalMedia = link.media || "all";
+
+    function enableStylesheet(){
+      link.media = finalMedia;
+    }
+
+    // bind load handlers to enable media
+    if( link.addEventListener ){
+      link.addEventListener( "load", enableStylesheet );
+    } else if( link.attachEvent ){
+      link.attachEvent( "onload", enableStylesheet );
+    }
+
+    // Set rel and non-applicable media type to start an async request
+    // note: timeout allows this to happen async to let rendering continue in IE
+    setTimeout(function(){
+      link.rel = "stylesheet";
+      link.media = "only x";
+    });
+    // also enable media after 3 seconds,
+    // which will catch very old browsers (android 2.x, old firefox) that don't support onload on link
+    setTimeout( enableStylesheet, 3000 );
+  };
+
+  // loop through link elements in DOM
+  rp.poly = function(){
+    // double check this to prevent external calls from running
+    if( rp.support() ){
+      return;
+    }
+    var links = w.document.getElementsByTagName( "link" );
+    for( var i = 0; i < links.length; i++ ){
+      var link = links[ i ];
+      // qualify links to those with rel=preload and as=style attrs
+      if( link.rel === "preload" && link.getAttribute( "as" ) === "style" && !link.getAttribute( "data-loadcss" ) ){
+        // prevent rerunning on link
+        link.setAttribute( "data-loadcss", true );
+        // bind listeners to toggle media back
+        rp.bindMediaToggle( link );
+      }
+    }
+  };
+
+  // if unsupported, run the polyfill
+  if( !rp.support() ){
+    // run once at least
+    rp.poly();
+
+    // rerun poly on an interval until onload
+    var run = w.setInterval( rp.poly, 500 );
+    if( w.addEventListener ){
+      w.addEventListener( "load", function(){
+        rp.poly();
+        w.clearInterval( run );
+      } );
+    } else if( w.attachEvent ){
+      w.attachEvent( "onload", function(){
+        rp.poly();
+        w.clearInterval( run );
+      } );
+    }
+  }
+
+
+  // commonjs
+  if( typeof exports !== "undefined" ){
+    exports.loadCSS = loadCSS;
+  }
+  else {
+    w.loadCSS = loadCSS;
+  }
+}( typeof global !== "undefined" ? global : this ) );</script><script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js" defer></script><script src="/js/main.js?v=2018.7.9" defer></script><!-- fancybox--><link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'"><script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js" defer></script><!-- busuanzi--><script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script><meta name="generator" content="Hexo 7.3.0"><link rel="alternate" href="/atom.xml" title="MyBlog" type="application/atom+xml">
+</head><body><section class="profile-close" id="cxo-profile"><div class="profile-avatar"><i class="fa fa-caret-left"></i><img src="/img/assets/cat.png"></div><!--.profile-saying
+  i.fa.fa-comment
+  .saying--><div class="cxo-profile-inner"><div class="profile-name">userq</div><div class="profile-signature">for me</div><div class="friends"><div>FRIENDS</div><span><a href="//1768161086.github.io/" target="_black">friendA</a></span><span><a href="//github.com/" target="_black">friendB</a></span><span><a href="//github.com/" target="_black">friendC</a></span></div><div class="read-progress"></div></div></section><header id="cxo-intro" style="height: 70vh;background-image: url(/img/intro/index-bg.png);"><nav id="cxo-intro-nav"><section><div class="intro-nav-title"><a href="/">Mr.cheng's Blog</a></div><div class="intro-nav-label-box"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div><i class="fa fa-bars intro-nav-menu"><div class="intro-nav-drop"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div></i><div class="clear"></div></section></nav><h1 class="post-title">Arjun查询参数</h1><div class="post-intros"><div class="post-intro-meta"><span class="post-intro-time"><i class="post-intro-calendar fa fa-calendar"></i><span>2025-04-02</span></span></div></div></header><article class="cxo-up" id="cxo-content-outer"><section id="cxo-content-inner"><article class="article-entry" id="post"><h2 id="1-Arjun是什么？"><a href="#1-Arjun是什么？" class="headerlink" title="1.Arjun是什么？"></a><strong>1.Arjun是什么？</strong></h2><p>Arjun 可以查找 URL 端点的查询参数。<a target="_blank" rel="noopener" href="https://so.csdn.net/so/search?q=Web%20%E5%BA%94%E7%94%A8%E7%A8%8B%E5%BA%8F&spm=1001.2101.3001.7020">Web 应用程序</a>使用参数（或查询）来接受用户输入，请考虑以下示例</p>
+<p>url?id&#x3D;751634589</p>
+<h2 id="2-项目安装"><a href="#2-项目安装" class="headerlink" title="2.项目安装"></a>2.项目安装</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git clone https://github.com/s0md3v/Arjun</span><br><span class="line">进入该目录执行：</span><br><span class="line">python3 setup.py install</span><br></pre></td></tr></table></figure>
+
+<h2 id="3-快速使用"><a href="#3-快速使用" class="headerlink" title="3.快速使用"></a><strong>3.快速使用</strong></h2><h3 id="3-1-扫描单个网址"><a href="#3-1-扫描单个网址" class="headerlink" title="3.1.扫描单个网址"></a>3.1.扫描单个网址</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">arjun -u https://api.example.com/endpoint</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-2-导入目标"><a href="#3-2-导入目标" class="headerlink" title="3.2.导入目标"></a>3.2.导入目标</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">arjun -i targets.txt</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-3-指定-HTTP-方法"><a href="#3-3-指定-HTTP-方法" class="headerlink" title="3.3.指定 HTTP 方法"></a>3.3.指定 HTTP 方法</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">arjun -u https://api.example.com/endpoint -m POST</span><br><span class="line">所有可用的方法有：GET/POST/JSON/XML</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-4-导出结果"><a href="#3-4-导出结果" class="headerlink" title="3.4.导出结果"></a>3.4.导出结果</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">arjun -u https://api.example.com/endpoint -oJ result.json</span><br><span class="line">-oJ result.json</span><br><span class="line">-oT result.txt</span><br><span class="line">-oB 127.0.0.1:8080</span><br><span class="line">可以使用相应的选项将结果导出到 BurpSuite 或 txt/JSON 文件。</span><br></pre></td></tr></table></figure>
+
+<h2 id="青少年CTF-穿梭隐藏的密钥"><a href="#青少年CTF-穿梭隐藏的密钥" class="headerlink" title="青少年CTF_穿梭隐藏的密钥"></a>青少年CTF_穿梭隐藏的密钥</h2><p>1.查看代码发现c3s4f.php目录</p>
+<p>2.提示：多fuzzfuzz总能fuzz出点啥</p>
+<p>3.这儿需要我们FUZZ出参数，使用工具<strong>Arjun</strong>（url参数扫描工具）查找</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">arjun -u http://challenge.qsnctf.com:30268/c3s4f.php</span><br></pre></td></tr></table></figure>
+
+<p>4.得到了参数shell，进行传参?shell&#x3D;123</p>
+<p>5.发现应该是SSRF，直接构造(过滤了127.0.0.1)</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">?shell=http://localtest.me/secret.php</span><br></pre></td></tr></table></figure>
+
+<p>6.我们得到了需要用到的KEY：MSIBLG ，并且得到下一关的地址cha11eng3.php</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"> &lt;?php</span><br><span class="line">show_source(__FILE__);</span><br><span class="line">include(&#x27;k4y.php&#x27;);</span><br><span class="line">include_once(&#x27;flag.php&#x27;);</span><br><span class="line">// Challenge 1</span><br><span class="line">if (isset($_GET[&#x27;DrKn&#x27;])) &#123;</span><br><span class="line">    $text = $_GET[&#x27;DrKn&#x27;];</span><br><span class="line">    if(@file_get_contents($text) == $key) &#123;</span><br><span class="line">        echo &quot;有点东西呢&quot;.&quot;&lt;/br&gt;&quot;.$key1.&quot;&lt;/br&gt;&quot;;</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">        die(&quot;貌似状态不在线啊(╯_╰)&lt;/br&gt;&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125; </span><br><span class="line">// Challenge 2</span><br><span class="line">if (isset($_GET[$key1])) &#123;</span><br><span class="line">    $damei = $_GET[$key1];</span><br><span class="line">    if (hash(&quot;md4&quot;, $damei) == $damei) &#123;</span><br><span class="line">        echo &quot;又近了一步呢，宝~&quot;.&quot;&lt;/br&gt;&quot;.$key2.&quot;&lt;/br&gt;&quot;.$key3;</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">        die(&quot;达咩哟~&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125; </span><br><span class="line">// Challenge 3</span><br><span class="line">if (isset($_POST[$key2]) &amp;&amp; isset($_POST[$key3])) &#123;</span><br><span class="line">    $user = $_POST[$key2];</span><br><span class="line">    $pass = $_POST[$key3];</span><br><span class="line"></span><br><span class="line">    if (strlen($user) &gt; 4 || strlen($pass) &gt; 5) &#123;</span><br><span class="line">          die(&quot;还得练&quot;);</span><br><span class="line">      &#125;</span><br><span class="line">     if ($user !== $pass &amp;&amp; md5($user) === md5($pass)) &#123;  </span><br><span class="line">          echo &quot;还不错哦&quot;.&quot;$flag&quot;;</span><br><span class="line">      &#125;</span><br><span class="line">      else &#123;</span><br><span class="line">          die(&quot;nonono&quot;) ;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">?&gt; </span><br></pre></td></tr></table></figure>
+
+<p>7.直接讲第二关：</p>
+<ul>
+<li>检查GET请求中是否包含参数<code>$key1</code>。</li>
+<li>获取参数<code>$key1</code>的值并检查其MD4哈希值是否等于自身。</li>
+<li>如果匹配，输出提示信息和<code>$key2</code>、<code>$key3</code>；否则，输出错误信息并终止脚本执行。</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">M[ore.8=0e001233333333333334557778889</span><br></pre></td></tr></table></figure>
+
+
+</article><!-- lincense--><div class="license-wrapper"><p> <span>Author:  </span><a href="http://1768161086.github,io">userq</a></p><p> <span>Link:  </span><a href="http://1768161086.github,io/2025/04/02/Arjun%E6%9F%A5%E8%AF%A2%E5%8F%82%E6%95%B0/">http://1768161086.github,io/2025/04/02/Arjun%E6%9F%A5%E8%AF%A2%E5%8F%82%E6%95%B0/</a></p><p> <span>Copyright:  </span><span>All articles in this blog are licensed under <a rel="license noopener" target="_blank" href="https://creativecommons.org/licenses/by-nc-nd/3.0">CC BY-NC-SA 3.0</a> unless stating additionally.</span></p></div><div class="post-paginator"><a class="prevSlogan" href="/2025/04/02/xss/" title="xss"><span>< PreviousPost</span><br><span class="prevTitle">xss</span></a><a class="nextSlogan" href="/2025/04/01/springbootThymeleaf%E6%A8%A1%E6%9D%BF%E6%B3%A8%E5%85%A5/" title="springbootThymeleaf模板注入"><span>NextPost ></span><br><span class="nextTitle">springbootThymeleaf模板注入</span></a><div class="clear"></div></div><div id="comment"></div></section></article><footer id="cxo-footer-outer"><div id="cxo-footer-inner"><p class="footer-container"><span>Site by </span><a target="_blank" rel="noopener" href="http://hexo.io"><span>Hexo</span></a><span> | theme </span><a target="_blank" rel="noopener" href="https://github.com/Longlongyu/hexo-theme-Cxo"><span>Cxo</span></a></p><i class="fa fa-user"> </i><span id="busuanzi_value_site_uv"></span><span> | </span><i class="fa fa-eye"> </i><span id="busuanzi_value_site_pv"></span></div></footer><!-- catelog--><div class="toc-wrapper" style="top: 70vh;"><div class="toc-catalog"><i class="fa fa-list"> </i><span>CATALOG</span></div><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-Arjun%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F"><span class="toc-number">1.</span> <span class="toc-text">1.Arjun是什么？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E9%A1%B9%E7%9B%AE%E5%AE%89%E8%A3%85"><span class="toc-number">2.</span> <span class="toc-text">2.项目安装</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E5%BF%AB%E9%80%9F%E4%BD%BF%E7%94%A8"><span class="toc-number">3.</span> <span class="toc-text">3.快速使用</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1-%E6%89%AB%E6%8F%8F%E5%8D%95%E4%B8%AA%E7%BD%91%E5%9D%80"><span class="toc-number">3.1.</span> <span class="toc-text">3.1.扫描单个网址</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-%E5%AF%BC%E5%85%A5%E7%9B%AE%E6%A0%87"><span class="toc-number">3.2.</span> <span class="toc-text">3.2.导入目标</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-3-%E6%8C%87%E5%AE%9A-HTTP-%E6%96%B9%E6%B3%95"><span class="toc-number">3.3.</span> <span class="toc-text">3.3.指定 HTTP 方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-4-%E5%AF%BC%E5%87%BA%E7%BB%93%E6%9E%9C"><span class="toc-number">3.4.</span> <span class="toc-text">3.4.导出结果</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%9D%92%E5%B0%91%E5%B9%B4CTF-%E7%A9%BF%E6%A2%AD%E9%9A%90%E8%97%8F%E7%9A%84%E5%AF%86%E9%92%A5"><span class="toc-number">4.</span> <span class="toc-text">青少年CTF_穿梭隐藏的密钥</span></a></li></ol></div><!-- top--><i class="fa fa-arrow-up close" id="go-up" aria-hidden="true"></i></body></html>
