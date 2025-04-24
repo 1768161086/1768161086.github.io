@@ -1,0 +1,134 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"><meta name="author" content="userq"><meta name="renderer" content="webkit"><meta name="copyright" content="userq"><meta name="keywords" content="MyBlog"><meta name="description" content="MyBlog"><meta name="Cache-Control" content="no-cache"><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><title>CTF中文件读取漏洞常见读取路径 · Mr.cheng's Blog</title><link rel="stylesheet" href="/css/style.css?v=2018.7.9"><link rel="stylesheet" href="/css/animation.css?v=2018.7.9"><link rel="icon" href="/img/assets/favicon.ico"><link rel="stylesheet" href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css?version=1.5.6"><!-- scripts--><script>(function( w ){
+  "use strict";
+  // rel=preload support test
+  if( !w.loadCSS ){
+    w.loadCSS = function(){};
+  }
+  // define on the loadCSS obj
+  var rp = loadCSS.relpreload = {};
+  // rel=preload feature support test
+  // runs once and returns a function for compat purposes
+  rp.support = (function(){
+    var ret;
+    try {
+      ret = w.document.createElement( "link" ).relList.supports( "preload" );
+    } catch (e) {
+      ret = false;
+    }
+    return function(){
+      return ret;
+    };
+  })();
+
+  // if preload isn't supported, get an asynchronous load by using a non-matching media attribute
+  // then change that media back to its intended value on load
+  rp.bindMediaToggle = function( link ){
+    // remember existing media attr for ultimate state, or default to 'all'
+    var finalMedia = link.media || "all";
+
+    function enableStylesheet(){
+      link.media = finalMedia;
+    }
+
+    // bind load handlers to enable media
+    if( link.addEventListener ){
+      link.addEventListener( "load", enableStylesheet );
+    } else if( link.attachEvent ){
+      link.attachEvent( "onload", enableStylesheet );
+    }
+
+    // Set rel and non-applicable media type to start an async request
+    // note: timeout allows this to happen async to let rendering continue in IE
+    setTimeout(function(){
+      link.rel = "stylesheet";
+      link.media = "only x";
+    });
+    // also enable media after 3 seconds,
+    // which will catch very old browsers (android 2.x, old firefox) that don't support onload on link
+    setTimeout( enableStylesheet, 3000 );
+  };
+
+  // loop through link elements in DOM
+  rp.poly = function(){
+    // double check this to prevent external calls from running
+    if( rp.support() ){
+      return;
+    }
+    var links = w.document.getElementsByTagName( "link" );
+    for( var i = 0; i < links.length; i++ ){
+      var link = links[ i ];
+      // qualify links to those with rel=preload and as=style attrs
+      if( link.rel === "preload" && link.getAttribute( "as" ) === "style" && !link.getAttribute( "data-loadcss" ) ){
+        // prevent rerunning on link
+        link.setAttribute( "data-loadcss", true );
+        // bind listeners to toggle media back
+        rp.bindMediaToggle( link );
+      }
+    }
+  };
+
+  // if unsupported, run the polyfill
+  if( !rp.support() ){
+    // run once at least
+    rp.poly();
+
+    // rerun poly on an interval until onload
+    var run = w.setInterval( rp.poly, 500 );
+    if( w.addEventListener ){
+      w.addEventListener( "load", function(){
+        rp.poly();
+        w.clearInterval( run );
+      } );
+    } else if( w.attachEvent ){
+      w.attachEvent( "onload", function(){
+        rp.poly();
+        w.clearInterval( run );
+      } );
+    }
+  }
+
+
+  // commonjs
+  if( typeof exports !== "undefined" ){
+    exports.loadCSS = loadCSS;
+  }
+  else {
+    w.loadCSS = loadCSS;
+  }
+}( typeof global !== "undefined" ? global : this ) );</script><script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js" defer></script><script src="/js/main.js?v=2018.7.9" defer></script><!-- fancybox--><link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'"><script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js" defer></script><!-- busuanzi--><script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script><meta name="generator" content="Hexo 7.3.0"><link rel="alternate" href="/atom.xml" title="MyBlog" type="application/atom+xml">
+</head><body><section class="profile-close" id="cxo-profile"><div class="profile-avatar"><i class="fa fa-caret-left"></i><img src="/img/assets/cat.png"></div><!--.profile-saying
+  i.fa.fa-comment
+  .saying--><div class="cxo-profile-inner"><div class="profile-name">userq</div><div class="profile-signature">for me</div><div class="friends"><div>FRIENDS</div><span><a href="//1768161086.github.io/" target="_black">friendA</a></span><span><a href="//github.com/" target="_black">friendB</a></span><span><a href="//github.com/" target="_black">friendC</a></span></div><div class="read-progress"></div></div></section><header id="cxo-intro" style="height: 70vh;background-image: url(/img/intro/index-bg.png);"><nav id="cxo-intro-nav"><section><div class="intro-nav-title"><a href="/">Mr.cheng's Blog</a></div><div class="intro-nav-label-box"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div><i class="fa fa-bars intro-nav-menu"><div class="intro-nav-drop"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div></i><div class="clear"></div></section></nav><h1 class="post-title">CTF中文件读取漏洞常见读取路径</h1><div class="post-intros"><div class="post-intro-meta"><span class="post-intro-time"><i class="post-intro-calendar fa fa-calendar"></i><span>2025-04-23</span></span></div></div></header><article class="cxo-up" id="cxo-content-outer"><section id="cxo-content-inner"><article class="article-entry" id="post"><h2 id="1-etc-目录"><a href="#1-etc-目录" class="headerlink" title="1.&#x2F;etc 目录"></a>1.&#x2F;etc 目录</h2><p>&#x2F;etc&#x2F;passwd :linux系统保存用户信息及其工作目录的文件，权限是可读。</p>
+<p>&#x2F;etc&#x2F;shadow:是linux系统保存用户信息及（可能存在）密码（hash）的文件，权限是root用户可读写。</p>
+<p>&#x2F;etc&#x2F;apache2&#x2F;*  :Apache配置文件，可以获知WEB目录，服务端口等信息。</p>
+<p>&#x2F;etc&#x2F;nginx&#x2F;*  :Nginx配置文件，可以获知WEB目录，服务端口等信息。</p>
+<p>&#x2F;etc&#x2F;apparmor.(d)&#x2F;*  Apparmor配置文件，可以获得各应用系统调用的白名单、黑名单。</p>
+<p>&#x2F;etc&#x2F;(cron.d&#x2F;*|crontab)  :定时任务文件</p>
+<p>&#x2F;etc&#x2F;environment 环境变量的配置文件之一。</p>
+<p>&#x2F;etc&#x2F;hostname 表示主机名</p>
+<p>&#x2F;etc&#x2F;hosts  是主机名查询静态列表，包含指定域名解析IP的成对信息。</p>
+<p>&#x2F;etc&#x2F;issue 指明系统版本</p>
+<p>&#x2F;etc&#x2F;mysql&#x2F;*  MYSQL配置文件。</p>
+<p>&#x2F;etc&#x2F;php&#x2F;* PHP配置文件</p>
+<h2 id="2-proc目录"><a href="#2-proc目录" class="headerlink" title="2.&#x2F;proc目录"></a>2.&#x2F;proc目录</h2><p>&#x2F;proc 目录通常存储着进程动态运行的各种信息，本质上是一种虚拟目录。如果查看非当前进程的信息，pid是可以进行暴力破解的，如果查看的是当前进程，只需要&#x2F;proc&#x2F;self代替&#x2F;proc&#x2F;[pid]即可。</p>
+<p>对应目录下的cmdline可读出比较敏感的信息，如使用mysql-uxxx -pxxx登陆mysql时，可以读出明文密码。</p>
+<p>&#x2F;proc&#x2F;[pid]&#x2F;cmdline   ([pid]指向进程对应的终端命令)</p>
+<p>&#x2F;proc&#x2F;self&#x2F;cmdline</p>
+<p>当我们无法获取当前应用所在的目录，通过cwd命令可以直接跳转到当前目录：</p>
+<p>&#x2F;proc&#x2F;[pid]&#x2F;cwd&#x2F;     ([pid] 指向进行运行目录)</p>
+<p>&#x2F;proc&#x2F;self&#x2F;cwd</p>
+<p>环境变量中可能存在secret_key,这时可以通过environ进行读取：</p>
+<p>&#x2F;proc&#x2F;[pid]&#x2F;environ  ([pid]指向进行运行时的环境变量）</p>
+<p>&#x2F;proc&#x2F;self&#x2F;environ</p>
+<p>指向启动当前进程的可执行文件（完整路径）的符号链接。通过exe文件我们可以获得指定进程的可执行文件的完整路径。[pid]指向进程所对应的可执行文件。有时我们想读取当前应用的可执行文件再进行分析，但在实际利用时可能存在一些安全措施阻止我们去读可执行文件，可以尝试访问：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/proc/self/exe</span><br></pre></td></tr></table></figure>
+
+<h2 id="3-其他目录"><a href="#3-其他目录" class="headerlink" title="3.其他目录"></a>3.其他目录</h2><p>Nginx配置文件可能存在的其他路径:</p>
+<p>&#x2F;usr&#x2F;local&#x2F;nginx&#x2F;conf&#x2F;*</p>
+<p>日志文件：</p>
+<p>&#x2F;var&#x2F;log&#x2F;*</p>
+<p>Apache 默认web根目录：</p>
+<p>&#x2F;var&#x2F;www&#x2F;html&#x2F;</p>
+<p>PHP session 目录：</p>
+<p>&#x2F;var&#x2F;lib&#x2F;php(5)&#x2F;sessions&#x2F;</p>
+</article><!-- lincense--><div class="license-wrapper"><p> <span>Author:  </span><a href="http://1768161086.github,io">userq</a></p><p> <span>Link:  </span><a href="http://1768161086.github,io/2025/04/23/CTF%E4%B8%AD%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E6%BC%8F%E6%B4%9E%E5%B8%B8%E8%A7%81%E8%AF%BB%E5%8F%96%E8%B7%AF%E5%BE%84/">http://1768161086.github,io/2025/04/23/CTF%E4%B8%AD%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E6%BC%8F%E6%B4%9E%E5%B8%B8%E8%A7%81%E8%AF%BB%E5%8F%96%E8%B7%AF%E5%BE%84/</a></p><p> <span>Copyright:  </span><span>All articles in this blog are licensed under <a rel="license noopener" target="_blank" href="https://creativecommons.org/licenses/by-nc-nd/3.0">CC BY-NC-SA 3.0</a> unless stating additionally.</span></p></div><div class="post-paginator"><a class="nextSlogan" href="/2025/04/16/Pyramid%E8%BF%9C%E7%A8%8B%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E-%E6%89%A7%E8%A1%8C%E5%86%85%E5%AD%98%E9%A9%AC/" title="Pyramid远程代码执行漏洞(执行内存马)"><span>NextPost ></span><br><span class="nextTitle">Pyramid远程代码执行漏洞(执行内存马)</span></a><div class="clear"></div></div><div id="comment"></div></section></article><footer id="cxo-footer-outer"><div id="cxo-footer-inner"><p class="footer-container"><span>Site by </span><a target="_blank" rel="noopener" href="http://hexo.io"><span>Hexo</span></a><span> | theme </span><a target="_blank" rel="noopener" href="https://github.com/Longlongyu/hexo-theme-Cxo"><span>Cxo</span></a></p><i class="fa fa-user"> </i><span id="busuanzi_value_site_uv"></span><span> | </span><i class="fa fa-eye"> </i><span id="busuanzi_value_site_pv"></span></div></footer><!-- catelog--><div class="toc-wrapper" style="top: 70vh;"><div class="toc-catalog"><i class="fa fa-list"> </i><span>CATALOG</span></div><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-etc-%E7%9B%AE%E5%BD%95"><span class="toc-number">1.</span> <span class="toc-text">1.&#x2F;etc 目录</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-proc%E7%9B%AE%E5%BD%95"><span class="toc-number">2.</span> <span class="toc-text">2.&#x2F;proc目录</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E5%85%B6%E4%BB%96%E7%9B%AE%E5%BD%95"><span class="toc-number">3.</span> <span class="toc-text">3.其他目录</span></a></li></ol></div><!-- top--><i class="fa fa-arrow-up close" id="go-up" aria-hidden="true"></i></body></html>
