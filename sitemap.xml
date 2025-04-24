@@ -2,6 +2,15 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://1768161086.github,io/2025/03/10/XXE/</loc>
+    
+    <lastmod>2025-04-24</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
     <loc>http://1768161086.github,io/2025/03/15/php%E5%8E%9F%E7%94%9F%E7%B1%BB/</loc>
     
     <lastmod>2025-04-24</lastmod>
@@ -86,15 +95,6 @@
     <loc>http://1768161086.github,io/2025/04/02/xss/</loc>
     
     <lastmod>2025-04-21</lastmod>
-    
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>http://1768161086.github,io/2025/03/10/XXE/</loc>
-    
-    <lastmod>2025-04-18</lastmod>
     
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
